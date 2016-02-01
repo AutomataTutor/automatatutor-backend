@@ -1,0 +1,14 @@
+alphabet: a b
+5 states
+final states: 3
+0,1,a
+0,0,b
+1,2,a
+1,0,b
+2,2,a
+2,3,b
+3,2,a
+3,4,b
+4,2,a
+4,4,b
+

@@ -1,0 +1,14 @@
+digraph "../../../PDLTest/DotFiles/sigmastar" {
+rankdir=LR; fontsize=12;
+
+//Initial state
+preInit [style = filled, shape = plaintext, color = white, fillcolor = white, label = " "]
+//Final states
+4 [style = filled, shape = circle, fillcolor = green, fontsize = 12]
+
+//Other states
+
+//Transitions
+preInit -> 4
+4 -> 4 [label = "[ab]", fontsize = 12 ];
+}

@@ -1,0 +1,16 @@
+alphabet: a b c
+4 states
+final states: 3
+0,1,a
+0,0,b
+0,0,c
+1,1,a
+1,0,c
+1,2,b
+2,1,a
+2,0,b
+2,3,c
+3,3,a
+3,3,b
+3,3,c
+

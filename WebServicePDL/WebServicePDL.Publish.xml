@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<publishData>
+  <publishProfile publishUrl="ftp://ftp.automatagrader.com/automatagrader.com/wwwroot" deleteExistingFiles="True" ftpAnonymousLogin="False" ftpPassiveMode="True" msdeploySite="" msdeploySiteID="" msdeployRemoteSitePhysicalPath="" msdeployAllowUntrustedCertificate="False" msdeploySkipExtraFilesOnServer="True" msdeployMarkAsApp="False" profileName="WebServicePDLProfile" publishMethod="FTP" replaceMatchingFiles="False" userName="graderk" savePWD="True" userPWD="AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAAkMZvIoNXUGQvt9/s3HV3wAAAAACAAAAAAAQZgAAAAEAACAAAADuZuiW4wGz+DnM6hX4EBKYBXPqjzcAnBVEqV3Gxw7uoQAAAAAOgAAAAAIAACAAAAAd1ZIhMRiFjXsZ2fjcA087H5yWKni5r6K8HgNhHbqmsSAAAAAK9aJIY4ujbItjUpyy2AaSlUwVPiO8ncnwhC1DKSOzx0AAAAAbxUp9xlo0IhM10rpAhnjlGkqI6U52/X+mzrEJmsZUsTpe3vTCcVzZgKWUtO7ds+pE4o4X8BxeAfE6amx12Bd3" SelectedForPublish="True">
+    <file relUrl="bin/MSOZ3.dll" publishTime="02/27/2015 21:57:24" />
+    <file relUrl="Service1.asmx" publishTime="01/27/2014 10:46:50" />
+    <file relUrl="bin/AutomataPDL.dll" publishTime="05/19/2015 20:21:58" />
+    <file relUrl="Web.config" publishTime="05/19/2015 20:22:17" />
+    <file relUrl="bin/WebServicePDL.pdb" publishTime="05/19/2015 20:22:00" />
+    <file relUrl="bin/WebServicePDL.dll" publishTime="05/19/2015 20:22:00" />
+    <file relUrl="bin/Microsoft.Automata.Z3.dll" publishTime="01/27/2014 10:46:49" />
+    <file relUrl="bin/Microsoft.Automata.dll" publishTime="01/27/2014 10:46:49" />
+    <file relUrl="bin/MSOZ3.pdb" publishTime="05/19/2015 20:21:58" />
+    <file relUrl="bin/Microsoft.Z3.dll" publishTime="01/27/2014 10:46:49" />
+    <file relUrl="bin/Antlr3.Runtime.dll" publishTime="01/27/2014 10:46:49" />
+  </publishProfile>
+  <publishProfile publishUrl="C:\inetpub\wwwroot\pdlweb" deleteExistingFiles="True" ftpAnonymousLogin="False" ftpPassiveMode="True" msdeploySite="" msdeploySiteID="" msdeployRemoteSitePhysicalPath="" msdeployAllowUntrustedCertificate="False" msdeploySkipExtraFilesOnServer="True" msdeployMarkAsApp="False" profileName="Parallels" publishMethod="FileSystem" replaceMatchingFiles="False" userName="" savePWD="False" userPWD="" SelectedForPublish="False">
+    <file relUrl="bin/MSOZ3.dll" publishTime="03/14/2014 13:59:13" />
+    <file relUrl="Service1.asmx" publishTime="04/17/2013 11:26:22" />
+    <file relUrl="bin/AutomataPDL.dll" publishTime="08/04/2014 21:31:10" />
+    <file relUrl="Web.config" publishTime="08/04/2014 21:31:19" />
+    <file relUrl="bin/AutomataPDL.pdb" publishTime="08/04/2014 21:31:10" />
+    <file relUrl="bin/WebServicePDL.dll" publishTime="08/04/2014 22:26:54" />
+    <file relUrl="bin/Microsoft.Z3.dll" publishTime="01/22/2014 17:22:24" />
+    <file relUrl="bin/Microsoft.Automata.Z3.dll" publishTime="01/22/2014 17:22:24" />
+    <file relUrl="bin/Microsoft.Automata.dll" publishTime="01/22/2014 17:22:24" />
+    <file relUrl="bin/MSOZ3.pdb" publishTime="03/14/2014 13:59:13" />
+    <file relUrl="bin/WebServicePDL.pdb" publishTime="08/04/2014 22:26:54" />
+    <file relUrl="bin/Antlr3.Runtime.dll" publishTime="01/22/2014 17:22:24" />
+  </publishProfile>
+</publishData>

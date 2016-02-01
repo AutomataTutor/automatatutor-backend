@@ -1,0 +1,14 @@
+digraph "../../../PDLTest/DotFiles/nota" {
+rankdir=LR; fontsize=12;
+
+//Initial state
+preInit [style = filled, shape = plaintext, color = white, fillcolor = white, label = " "]
+//Final states
+0 [style = filled, shape = circle, fillcolor = green, fontsize = 12]
+
+//Other states
+
+//Transitions
+preInit -> 0
+0 -> 0 [label = "b", fontsize = 12 ];
+}
