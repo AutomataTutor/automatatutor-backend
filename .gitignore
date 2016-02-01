@@ -1,0 +1,14 @@
+.vs/config/applicationhost.config
+AutomataPDL/obj/Debug/AutomataPDL.csproj.FileListAbsolute.txt
+LTLMSO/obj/Debug/LTLMSO.csproj.FileListAbsolute.txt
+LTLMSOTest/obj/Debug/LTLMSOTest.csproj.FileListAbsolute.txt
+MSOZ3/obj/Debug/MSOZ3.csproj.FileListAbsolute.txt
+MSOZ3Test/obj/Debug/MSOZ3Test.csproj.FileListAbsolute.txt
+Mona/obj/Debug/Mona.csproj.FileListAbsolute.txt
+MonaTest/obj/Debug/MonaTest.csproj.FileListAbsolute.txt
+ProblemGenerationTest/obj/Debug/ProblemGenerationTest.csproj.FileListAbsolute.txt
+PumpingLemma/obj/Debug/PumpingLemma.csproj.FileListAbsolute.txt
+PumpingLemmaTest/obj/Debug/PumpingLemmaTest.csproj.FileListAbsolute.txt
+TestPDL/obj/Debug/TestPDL.csproj.FileListAbsolute.txt
+WebServicePDL/bin/WebServicePDL.dll.config
+WebServicePDL/obj/Debug/WebServicePDL.csproj.FileListAbsolute.txt
