@@ -846,7 +846,10 @@ namespace AutomataPDL
                     else
                         oldCondition = solver.False;
 
-                    moveConditions[target] = solver.MkOr(oldCondition, moveFromSourceState.Condition);
+                    if (!moveFromSourceState.IsEpsilon)
+                        moveConditions[target] = solver.MkOr(oldCondition, moveFromSourceState.Condition);
+                    else
+                        normMoves.Add(moveFromSourceState);
                 }
 
                 foreach (var targetState in moveConditions.Keys)             
