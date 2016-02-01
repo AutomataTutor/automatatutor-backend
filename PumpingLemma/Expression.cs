@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Z3;
 using System.Diagnostics.Contracts;
+using System.Xml.Linq;
 
 namespace PumpingLemma
 {
@@ -56,6 +57,28 @@ namespace PumpingLemma
             return Variable(variable_name);
         }
 
+
+        public override XElement ToDisplayXML()
+        {
+            var root = new XElement("text");
+
+            var tspan = new XElement("tspan");
+
+            var x = this.ToString().Split('_');
+            if (x.Count() != 2)
+                tspan.Value = this.ToString();
+            else
+            {
+                tspan.Add(new XElement("tspan", x[0]));
+                var sub = new XElement("tspan", x[1]);
+                sub.SetAttributeValue("dominant-baseline", "text-after-edge");
+                sub.SetAttributeValue("font-size", "50%");
+                tspan.Add(sub);
+            }
+
+            root.Add(tspan);
+            return root;
+        }
     }
 
     public abstract class Expression
@@ -66,6 +89,8 @@ namespace PumpingLemma
         abstract public HashSet<VariableType> GetVariables();
 
         abstract public Expr toZ3(Context ctx);
+
+        abstract public XElement ToDisplayXML();
     }
 
     // Should probably split this class into multiple ones
@@ -279,6 +304,43 @@ namespace PumpingLemma
                 default: throw new ArgumentException();
             }
         }
+
+        public override XElement ToDisplayXML()
+        {
+            var root = new XElement("text");
+
+            switch (this.logical_operator)
+            {
+                case LogicalOperator.True:
+                    root.Add(new XElement("tspan", "True"));
+                    break;
+                case LogicalOperator.False:
+                    root.Add(new XElement("tspan", "False"));
+                    break;
+                case LogicalOperator.And:
+                    foreach (var child in this.operand1.ToDisplayXML().Elements())
+                        root.Add(child);
+                    // root.Add(new XElement("tspan", System.Net.WebUtility.HtmlEncode('\u2227'.ToString())));
+                    root.Add(new XElement("tspan", " && "));
+                    foreach (var child in this.operand2.ToDisplayXML().Elements())
+                        root.Add(child);
+                    break;
+                case LogicalOperator.Or:
+                    foreach (var child in this.operand1.ToDisplayXML().Elements())
+                        root.Add(child);
+                    // root.Add(new XElement("tspan", System.Net.WebUtility.HtmlEncode('\u2228'.ToString())));
+                    root.Add(new XElement("tspan", " || "));
+                    foreach (var child in this.operand2.ToDisplayXML().Elements())
+                        root.Add(child);
+                    break;
+                case LogicalOperator.Not: 
+                    root.Add(new XElement("tspan", "!"));
+                    break;
+                default: throw new ArgumentException();
+            }
+
+            return root;
+        }
     }
 
     public class ComparisonExpression : BooleanExpression
@@ -298,6 +360,40 @@ namespace PumpingLemma
 
         public LinearIntegerExpression arithmetic_operand1;
         public LinearIntegerExpression arithmetic_operand2;
+
+        public override XElement ToDisplayXML()
+        {
+            var root = new XElement("text");
+            foreach (var child in operand1.ToDisplayXML().Elements())
+                root.Add(child);
+
+            string operator_string;
+            switch (this.comparison_operator)
+            {
+                case ComparisonOperator.EQ: operator_string = " = "; break;
+                case ComparisonOperator.NEQ: operator_string = " != "; break;
+                case ComparisonOperator.LEQ: operator_string = " <= "; break;
+                case ComparisonOperator.GT: operator_string = " > "; break;
+                case ComparisonOperator.LT: operator_string = " < "; break;
+                case ComparisonOperator.GEQ: operator_string = " >= "; break;
+
+                    /*
+                case ComparisonOperator.EQ: operator_string = "="; break;
+                case ComparisonOperator.NEQ: operator_string = "\u2260"; break;
+                case ComparisonOperator.LEQ: operator_string = "\u2264"; break;
+                case ComparisonOperator.GEQ: operator_string = "\u2265"; break;
+                case ComparisonOperator.GT: operator_string = ">"; break;
+                case ComparisonOperator.LT: operator_string = "<"; break;
+                     */
+
+                default: throw new ArgumentException();
+            }
+            root.Add(new XElement("tspan", operator_string));
+
+            foreach (var child in operand2.ToDisplayXML().Elements())
+                root.Add(child);
+            return root;
+        }
 
         private ComparisonExpression(ComparisonOperator op, LinearIntegerExpression oper1, LinearIntegerExpression oper2)
         {
@@ -423,6 +519,11 @@ namespace PumpingLemma
         public Quantifier quantifier;
         public HashSet<VariableType> quantified_variables;
         public BooleanExpression inner;
+
+        public override XElement ToDisplayXML()
+        {
+            throw new NotImplementedException();
+        }
 
         private QuantifiedExpression(Quantifier q, IEnumerable<VariableType> v, BooleanExpression oper1)
         {
@@ -633,6 +734,39 @@ namespace PumpingLemma
         public static LinearIntegerExpression operator -(LinearIntegerExpression a, int b)
         {
             return Plus(a, LinearIntegerExpression.Constant(-b));
+        }
+
+        public override XElement ToDisplayXML()
+        {
+            var root = new XElement("text");
+            {
+                int i = 0;
+                foreach (var v in this.coefficients.Keys)
+                {
+                    if (this.coefficients[v] == 0)
+                        continue;
+                    if (this.coefficients[v] != 1)
+                    {
+                        root.Add(new XElement("tspan", this.coefficients[v].ToString()));
+                    }
+
+                    foreach (var child in v.ToDisplayXML().Elements())
+                        root.Add(child);
+
+                    i = i + 1;
+                    if (i <  this.coefficients.Count())
+                    {
+                        root.Add(new XElement("tspan", " + "));
+                    }
+                }
+            }
+            
+            if (this.constant == 0 && this.coefficients.Keys.Count == 0)
+                root.Add(new XElement("tspan", this.constant.ToString()));
+            else if (this.constant != 0)
+                root.Add(new XElement("tspan", " + " + this.constant.ToString()));
+
+            return root;
         }
     }
 

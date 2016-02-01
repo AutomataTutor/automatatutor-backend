@@ -76,6 +76,18 @@ namespace PumpingLemma
                 throw new ArgumentException();
         }
 
+        public IEnumerable<SymbolicString> wordSymbols()
+        {
+            Debug.Assert(this.isWord());
+            Debug.Assert(this.isFlat());
+            if (this.expression_type == SymbolicStringType.Symbol)
+                return new List<SymbolicString> { this };
+            else if (this.expression_type == SymbolicStringType.Concat)
+                return this.sub_strings;
+            else
+                throw new ArgumentException();
+        }
+
         public int wordLength()
         {
             Debug.Assert(this.isWord());
@@ -245,12 +257,13 @@ namespace PumpingLemma
                 var symbstr = new XElement("symbstr");
                 var strings = new XElement("strings");
                 var splits = new XElement("splits");
+                var constrs = new XElement("constraints");
 
                 Func<string, Tuple<int, int, SymbolicString>, XElement> handleSegment = (parentTagName, segment) => {
                     var parent = new XElement(parentTagName);
                     var from = new XElement("from"); from.Value = segment.Item1.ToString();
                     var to = new XElement("to"); to.Value = segment.Item2.ToString();
-                    var label = new XElement("label"); label.Value = segment.Item3.ToString();
+                    var label = new XElement("label"); label.Add(segment.Item3.ToDisplayXML());
                     parent.Add(from);
                     parent.Add(to);
                     parent.Add(label);
@@ -265,12 +278,55 @@ namespace PumpingLemma
                 foreach (var segment in new[] { split.start, split.mid, split.end })
                     splits.Add(handleSegment("split", segment.makeSegment(splitModel, ref splitIndex))); 
 
+                var constr = new XElement("constraint");
+                constr.Add(split.constraints.ToDisplayXML());
+                constrs.Add(constr);
+
                 symbstr.Add(strings);
                 symbstr.Add(splits);
+                symbstr.Add(constrs);
                 symbstrings.Add(symbstr);
             }
 
             return symbstrings;
+        }
+
+        private XElement ToDisplayXML()
+        {
+            var root = new XElement("text");
+            switch (this.expression_type)
+            {
+                case SymbolicStringType.Symbol:
+                    root.Add(new XElement("tspan", this.ToString()));
+                    break;
+                case SymbolicStringType.Repeat:
+                    if (this.root.wordLength() > 1)
+                        root.Add(new XElement("tspan", "("));
+                    root.Add(new XElement("tspan", this.root.ToString()));
+                    if (this.root.wordLength() > 1)
+                        root.Add(new XElement("tspan", ")"));
+
+                    var tspan2 = new XElement("tspan");
+                    tspan2.SetAttributeValue("dominant-baseline", "hanging");
+                    tspan2.SetAttributeValue("font-size", "50%");
+                    XElement exp = this.repeat.ToDisplayXML();
+                    foreach (var child in exp.Elements())
+                    {
+                        tspan2.Add(child);
+                    }
+                    root.Add(tspan2);
+                    break;
+                case SymbolicStringType.Concat:
+                    foreach (var sub in this.sub_strings.Select(x => x.ToDisplayXML()))
+                    {
+                        foreach (var child in sub.Elements())
+                            root.Add(child);
+                    }
+                    break;
+                default:
+                    throw new ArgumentException();
+            }
+            return root;
         }
 
         // Generates splits (x, y, z) such that |y| > 0 and |xy| < p
@@ -320,9 +376,9 @@ namespace PumpingLemma
                     //    BEG: (a_0 \ldots a_{n-1})^i (a_0 \ldots a_p)                              = w^i . w_1
                     //    MID: (a_{p+1} \ldots a_{n-1} a_0 \ldots a_p)^j (a_{p+1} \ldots a_q)       = (w_2 w_1)^j  w_3
                     //    END: (a_{q+1} \ldots a_{n-1}) (a_0 \ldots a_{n-1})^k                          = w_4 w^k
-                    var w = this.root.sub_strings;
+                    var w = this.root.wordSymbols();
                     var ww = w.Concat(w);
-                    int n = w.Count;
+                    int n = w.Count();
                     for (int w1len = 0; w1len < n; w1len++)
                     {
                         var w_1 = w.Take(w1len);

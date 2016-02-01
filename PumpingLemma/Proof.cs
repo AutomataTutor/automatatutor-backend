@@ -8,6 +8,26 @@ namespace PumpingLemma
 {
     public class ProofChecker
     {
+        public static bool checkPumping(
+            ArithmeticLanguage language,
+            SymbolicString pumpingString,
+            Split split,
+            LinearIntegerExpression pump)
+        {
+            if (pump.isConstant())
+            {
+                var k = pump.constant;
+                var pumpedMid = SymbolicString.Concat(Enumerable.Repeat(split.mid, k));
+                var pumpedString = SymbolicString.Concat(split.start, pumpedMid, split.end);
+
+                return checkNonContainment(pumpedString, language, split.constraints);
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public static bool check(ArithmeticLanguage language, SymbolicString pumpingString)
         {
             if (pumpingString.GetIntegerVariables().Count() != 1)
@@ -45,7 +65,7 @@ namespace PumpingLemma
             return true;
         }
 
-        public static bool checkContainment(SymbolicString s, ArithmeticLanguage l, BooleanExpression additionalConstraints)
+        public static BooleanExpression containmentCondition(SymbolicString s, ArithmeticLanguage l, BooleanExpression additionalConstraints)
         {
             // Console.WriteLine("Checking containment of " + s + " in " + l);
             var goodMatches = Matcher
@@ -55,7 +75,7 @@ namespace PumpingLemma
                 .Where(x => x.isFeasible())
                 ;
             if (goodMatches.Count() == 0)
-                return false;
+                return LogicalExpression.False();
 
             var matchCondition = LogicalExpression.False();
             foreach (var match in goodMatches)
@@ -72,8 +92,78 @@ namespace PumpingLemma
             var eCondition = QuantifiedExpression.Exists(nonPVariables, condition);
             var aCondition = QuantifiedExpression.Forall(pVariables, eCondition);
 
-            return !LogicalExpression.Not(aCondition).isSatisfiable();
+            return aCondition;
         }
+
+        public static bool checkContainment(SymbolicString s, ArithmeticLanguage l, BooleanExpression additionalConstraints)
+        {
+            var condition = containmentCondition(s, l, additionalConstraints);
+            // Check if the containment condition is valid
+            return !LogicalExpression.Not(condition).isSatisfiable();
+        }
+
+        public static bool checkNonContainment(SymbolicString s, ArithmeticLanguage l, BooleanExpression additionalConstraints)
+        {
+            var condition = containmentCondition(s, l, additionalConstraints);
+            // Check if the containment condition is unsatisfiable
+            return !condition.isSatisfiable();
+        }
+
+        // Returns true if start.(mid)^witness.end is not in the language for all models
+        // that satisfy the additionalConstraint
+        public static bool splitGoodWithWitness(
+            Split split,
+            ArithmeticLanguage language,
+            BooleanExpression additionalConstraint, 
+            LinearIntegerExpression pumpingWitness)
+        {
+            // We just need to find a k such that (x y^k z) \not\in L
+            // If we cannot find such a k for some p, it is a bad split
+
+            // Say i, j are the variables in the language constraint and 
+            // v_1, v_2 are variables in split constraints
+            // Therefore, if for all p, v_1, \ldots, v_n that satisfies split constraints
+            // and additional constraints and exists k such that for all i, j language 
+            // constraint does not hold, then split is bad
+            Console.WriteLine("\t\tSplit is good if none of the following mids can be pumped: ");
+
+            // We will definitely go through the loop at least once as match is working
+            var beginningMatches = Matcher
+                .match(split.start, language.symbolic_string)
+                .Where(x => !x.FirstRemaining)
+                .Select(x => x.withAdditionalConstraint(language.constraint))
+                .Select(x => x.withAdditionalConstraint(additionalConstraint))
+                .Where(x => x.isFeasible());
+            foreach (var beginMatch in beginningMatches)
+            {
+                var remainingLanguage = beginMatch.remaining2;
+                var endMatches = Matcher
+                    .match(split.end.reverse(), remainingLanguage.reverse())
+                    .Where(x => !x.FirstRemaining)
+                    .Select(x => x.withAdditionalConstraint(language.constraint))
+                    .Select(x => x.withAdditionalConstraint(additionalConstraint))
+                    .Where(x => x.isFeasible());
+
+                foreach (var endMatch in endMatches)
+                {
+                    var fullConstraint = LogicalExpression.And(beginMatch.constraint, endMatch.constraint);
+                    if (!fullConstraint.isSatisfiable())
+                        continue;
+                    var midLanguage = endMatch.remaining2.reverse();
+                    var midSplit = split.mid;
+                    var ctx = new Context();
+                    // Console.WriteLine("\t\t" + midLanguage + " ===== " + midSplit + " when " + fullConstraint);
+                    // var z3exp = fullConstraint.toZ3(ctx).Simplify();
+                    // Console.WriteLine("\t\t" + midLanguage + " ===== " + midSplit + " when " + z3exp);
+                    if (!canMismatchWitness(midLanguage, midSplit, fullConstraint, pumpingWitness))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
 
         // Strategy:
         // a) Match the prefix and suffix of the language with the x and z 
@@ -140,6 +230,16 @@ namespace PumpingLemma
                 // Do something here
             }
             */
+            throw new NotImplementedException();
+        }
+
+        public static bool canMismatchWitness(
+            SymbolicString midLanguage,
+            SymbolicString midSplit,
+            BooleanExpression fullConstraint,
+            LinearIntegerExpression pumpingWitness
+            )
+        {
             throw new NotImplementedException();
         }
     }
