@@ -387,15 +387,15 @@ namespace TestPDL
 
             var movesAttempt = new List<Move<BvSet>>();
 
-            movesSolution.Add(new Move<BvSet>(0, 0, a));
-            movesSolution.Add(new Move<BvSet>(0, 1, b));
-            movesSolution.Add(new Move<BvSet>(0, 1, null));
-            movesSolution.Add(new Move<BvSet>(1, 2, a));
-            movesSolution.Add(new Move<BvSet>(1, 1, b));
-            movesSolution.Add(new Move<BvSet>(2, 2, a));
-            movesSolution.Add(new Move<BvSet>(2, 3, b));
-            movesSolution.Add(new Move<BvSet>(3, 0, a));
-            movesSolution.Add(new Move<BvSet>(3, 3, b));
+            movesAttempt.Add(new Move<BvSet>(0, 0, a));
+            movesAttempt.Add(new Move<BvSet>(0, 1, b));
+            movesAttempt.Add(new Move<BvSet>(0, 1, null));
+            movesAttempt.Add(new Move<BvSet>(1, 2, a));
+            movesAttempt.Add(new Move<BvSet>(1, 1, b));
+            movesAttempt.Add(new Move<BvSet>(2, 2, a));
+            movesAttempt.Add(new Move<BvSet>(2, 3, b));
+            movesAttempt.Add(new Move<BvSet>(3, 0, a));
+            movesAttempt.Add(new Move<BvSet>(3, 3, b));
             var dfaAttempt = Automaton<BvSet>.Create(0, new int[] { 0,1 }, movesAttempt);
 
             var gr = NFAGrading.GetGrade(dfaSolution, dfaAttempt, al, solver, 4000, 10, FeedbackLevel.Hint);
@@ -403,7 +403,7 @@ namespace TestPDL
             foreach (var f in gr.Second)
                 Console.WriteLine(f.ToString());
 
-            gr = NFAGrading.GetGrade(dfaSolution, dfaAttempt, al, solver, 4000, 10, FeedbackLevel.Hint);
+            gr = NFAGrading.GetGrade(dfaAttempt, dfaSolution, al, solver, 4000, 10, FeedbackLevel.Hint);
             Console.WriteLine(gr.First);
             foreach (var f in gr.Second)
                 Console.WriteLine(f.ToString());
