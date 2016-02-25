@@ -78,7 +78,7 @@ namespace TestPDL
 
 
         #region ACCESSORIES METHODS
-        private static void PrintDFA(Automaton<BvSet> dfa, string name, HashSet<char> al)
+        private static void PrintDFA(Automaton<BDD> dfa, string name, HashSet<char> al)
         {
             var sb = new StringBuilder();
             DFAUtilities.printDFA(dfa, al, sb);
@@ -88,7 +88,7 @@ namespace TestPDL
             file.Close();
         }
 
-        private static Pair<HashSet<char>, Automaton<BvSet>> ReadDFA(string name, CharSetSolver solver)
+        private static Pair<HashSet<char>, Automaton<BDD>> ReadDFA(string name, CharSetSolver solver)
         {
             System.IO.StreamReader file = new System.IO.StreamReader(@"../../../TestPDL/DFAs/" + name + ".txt");
             string res = file.ReadToEnd();

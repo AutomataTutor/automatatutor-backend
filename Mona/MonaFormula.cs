@@ -33,7 +33,7 @@ namespace Mona
         /// <param name="alphabet">DFA alphabet</param>
         /// <param name="solver">Char solver</param>
         /// <returns>the DFA corresponding to the Monapred, null if it can't find it</returns>
-        public virtual Automaton<BvSet> GetDFA(HashSet<Char> alphabet, CharSetSolver solver)
+        public virtual Automaton<BDD> GetDFA(HashSet<Char> alphabet, CharSetSolver solver)
         {
             try
             {

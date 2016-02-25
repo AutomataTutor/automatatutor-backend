@@ -31,7 +31,7 @@ namespace AutomataPDL
         /// <param name="sb"></param>
         /// <returns></returns>
         public static DFAEditScript GetDFAOptimalEdit( // copy
-            Automaton<BvSet> dfa1, Automaton<BvSet> dfa2,
+            Automaton<BDD> dfa1, Automaton<BDD> dfa2,
             HashSet<char> al, CharSetSolver solver, long timeout,
             StringBuilder sb)
         {
@@ -41,7 +41,7 @@ namespace AutomataPDL
             DFAEditScript editScript = new DFAEditScript();
 
             #region Add states to dfa2 to make it at least as dfa1
-            BvSet fullAlphabetCondition = BvSetOf(al, solver);
+            BDD fullAlphabetCondition = BDDOf(al, solver);
 
             //Normalize the DFA giving only names from 0 to |States|-1
             var normDfaPair = DFAUtilities.normalizeDFA(dfa2);
@@ -50,7 +50,7 @@ namespace AutomataPDL
             var stateNamesMapping = normDfaPair.Second;
 
             //Add states to make dfa2 have the |dfa2.States|>= |dfa1.States|
-            var newMoves = new List<Move<BvSet>>(dfa2augmented.GetMoves());
+            var newMoves = new List<Move<BDD>>(dfa2augmented.GetMoves());
 
             for (int i = 1; i <= dfa1.StateCount - dfa2augmented.StateCount; i++)
             {
@@ -59,11 +59,11 @@ namespace AutomataPDL
                 stateNamesMapping[newStateName] = dfa2.MaxState + i;
                 //save the operation in the script
                 editScript.script.Insert(0, new DFAAddState(dfa2.MaxState + i));
-                newMoves.Add(new Move<BvSet>(newStateName, newStateName, fullAlphabetCondition));
+                newMoves.Add(new Move<BDD>(newStateName, newStateName, fullAlphabetCondition));
                 newStateName++;
             }
             //Create the new DFA with the added states
-            dfa2augmented = Automaton<BvSet>.Create(dfa2augmented.InitialState, dfa2augmented.GetFinalStates().ToList(), newMoves);
+            dfa2augmented = Automaton<BDD>.Create(dfa2augmented.InitialState, dfa2augmented.GetFinalStates().ToList(), newMoves);
             #endregion
 
             int maxScore = (dfa1.StateCount + dfa2augmented.StateCount) * (al.Count + 1);
@@ -106,7 +106,7 @@ namespace AutomataPDL
         // returns false and not null in bestScript if found
         // returns true if timeout
         internal static bool GetDFAEditScriptTimeout(
-            Automaton<BvSet> dfa1, Automaton<BvSet> dfa2,
+            Automaton<BDD> dfa1, Automaton<BDD> dfa2,
             HashSet<char> al, CharSetSolver solver,
             List<long> editScriptHash, List<DFAEdit> editList,
             int depth, long timeout, Stopwatch sw,
@@ -142,7 +142,7 @@ namespace AutomataPDL
                 movesWithoutCurrMove.Remove(move);
 
                 //Redirect every ch belonging to move condition
-                foreach (var c in solver.GenerateAllCharacters(move.Condition, false))
+                foreach (var c in solver.GenerateAllCharacters(move.Label, false))
                 {
                     long hash = IntegerUtil.PairToInt(move.SourceState, c - 97) + dfa2.StateCount;
 
@@ -155,10 +155,10 @@ namespace AutomataPDL
                         var newMoveCondition = solver.MkCharConstraint(false, c);
 
                         #region Remove ch from current move
-                        var andCond = solver.MkAnd(move.Condition, solver.MkNot(newMoveCondition));
+                        var andCond = solver.MkAnd(move.Label, solver.MkNot(newMoveCondition));
                         //add back move without ch iff satisfiable
                         if (solver.IsSatisfiable(andCond))
-                            newMoves.Add(new Move<BvSet>(move.SourceState, move.TargetState, andCond));
+                            newMoves.Add(new Move<BDD>(move.SourceState, move.TargetState, andCond));
                         #endregion
 
                         #region Redirect c to a different state
@@ -166,8 +166,8 @@ namespace AutomataPDL
                             if (state != move.TargetState)
                             {
                                 var newMovesComplete = newMoves.ToList();
-                                newMovesComplete.Add(new Move<BvSet>(move.SourceState, state, newMoveCondition));
-                                var dfa2new = Automaton<BvSet>.Create(dfa2.InitialState, dfa2.GetFinalStates(), newMovesComplete);
+                                newMovesComplete.Add(new Move<BDD>(move.SourceState, state, newMoveCondition));
+                                var dfa2new = Automaton<BDD>.Create(dfa2.InitialState, dfa2.GetFinalStates(), newMovesComplete);
 
                                 edit = new DFAEditMove(stateNamesMapping[move.SourceState], stateNamesMapping[state], c);
                                 editList.Insert(0, edit);
@@ -193,20 +193,20 @@ namespace AutomataPDL
                     editScriptHash.Insert(0, state);
 
                     var newFinalStates = new HashSet<int>(dfa2.GetFinalStates());
-                    Automaton<BvSet> dfa2new = null;
+                    Automaton<BDD> dfa2new = null;
                     if (dfa2.GetFinalStates().Contains(state))
                     {
                         edit = new DFAEditState(stateNamesMapping[state], false);
                         editList.Insert(0, edit);
                         newFinalStates.Remove(state);
-                        dfa2new = Automaton<BvSet>.Create(dfa2.InitialState, newFinalStates, dfa2.GetMoves());
+                        dfa2new = Automaton<BDD>.Create(dfa2.InitialState, newFinalStates, dfa2.GetMoves());
                     }
                     else
                     {
                         edit = new DFAEditState(stateNamesMapping[state], true);
                         editList.Insert(0, edit);
                         newFinalStates.Add(state);
-                        dfa2new = Automaton<BvSet>.Create(dfa2.InitialState, newFinalStates, dfa2.GetMoves());
+                        dfa2new = Automaton<BDD>.Create(dfa2.InitialState, newFinalStates, dfa2.GetMoves());
                     }
 
                     if (GetDFAEditScriptTimeout(dfa1, dfa2new, al, solver, editScriptHash, editList, depth - 1, timeout, sw, tests, dfa1density, totalCost + edit.GetCost(), bestScript, stateNamesMapping))
@@ -227,10 +227,10 @@ namespace AutomataPDL
             return editList.Count == 0 || elemCode < editList.ElementAt(0);
         }
 
-        private static BvSet BvSetOf(IEnumerable<char> alphabet, CharSetSolver solver)
+        private static BDD BDDOf(IEnumerable<char> alphabet, CharSetSolver solver)
         {
             bool fst = true;
-            BvSet safeCharCond = null;
+            BDD safeCharCond = null;
             foreach (var c in alphabet)
                 if (fst)
                 {

@@ -24,7 +24,7 @@ namespace AutomataPDL
         /// <param name="maxGrade">Max grade for the homework</param>
         /// <returns>Grade for dfa2</returns>
         public static Pair<int, IEnumerable<DFAFeedback>> GetGrade(
-            Automaton<BvSet> solution, Automaton<BvSet> attempt, HashSet<char> alpahbet,
+            Automaton<BDD> solution, Automaton<BDD> attempt, HashSet<char> alpahbet,
             CharSetSolver solver, long timeout, int maxGrade)
         {            
             return GetGrade(solution, attempt, alpahbet, solver, timeout, maxGrade, FeedbackLevel.Minimal, true, true, true);
@@ -42,7 +42,7 @@ namespace AutomataPDL
         /// <param name="level">Feedback level</param>
         /// <returns>Grade for dfa2</returns>
         public static Pair<int, IEnumerable<DFAFeedback>> GetGrade(
-            Automaton<BvSet> solution, Automaton<BvSet> attempt, HashSet<char> alpahbet,
+            Automaton<BDD> solution, Automaton<BDD> attempt, HashSet<char> alpahbet,
             CharSetSolver solver, long timeout, int maxGrade, FeedbackLevel level)
         {
             return GetGrade(solution, attempt, alpahbet, solver, timeout, maxGrade, level, true, true, true);
@@ -62,7 +62,7 @@ namespace AutomataPDL
         /// <param name="enableDensity">true to enable density distance</param>
         /// <returns>Grade for dfa2</returns>
         public static Pair<int, IEnumerable<DFAFeedback>> GetGrade(
-            Automaton<BvSet> dfaGoal, Automaton<BvSet> dfaAttempt, HashSet<char> al,
+            Automaton<BDD> dfaGoal, Automaton<BDD> dfaAttempt, HashSet<char> al,
             CharSetSolver solver, long timeout,
             int maxGrade, FeedbackLevel level,
             bool enableDFAED, bool enablePDLED, bool enableDensity)
@@ -211,7 +211,7 @@ namespace AutomataPDL
         /// <param name="al"></param>
         /// <param name="solver"></param>
         /// <returns></returns>
-        public static bool ContainsSyntacticMistake(Automaton<BvSet> dfa, HashSet<char> al,
+        public static bool ContainsSyntacticMistake(Automaton<BDD> dfa, HashSet<char> al,
             CharSetSolver solver, HashSet<int> missingEdges)
         {
             bool mistake = false;
@@ -221,7 +221,7 @@ namespace AutomataPDL
                 HashSet<char> alCopy = new HashSet<char>(al);
                 foreach (var move in dfaNorm.GetMovesFrom(state))
                 {
-                    foreach (var c in solver.GenerateAllCharacters(move.Condition, false))
+                    foreach (var c in solver.GenerateAllCharacters(move.Label, false))
                     {
                         if (!alCopy.Contains(c))
                         {

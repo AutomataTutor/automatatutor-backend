@@ -24,7 +24,7 @@ namespace AutomataPDL
         /// <param name="level">Feedback level</param>
         /// <returns>Grade for nfa2</returns>
         public static Pair<int, IEnumerable<NFAFeedback>> GetGrade(
-            Automaton<BvSet> solutionNFA, Automaton<BvSet> attemptNFA, HashSet<char> alphabet,
+            Automaton<BDD> solutionNFA, Automaton<BDD> attemptNFA, HashSet<char> alphabet,
             CharSetSolver solver, long timeout, int maxGrade, FeedbackLevel level)
         {
             var feedbacks = new List<NFAFeedback>();

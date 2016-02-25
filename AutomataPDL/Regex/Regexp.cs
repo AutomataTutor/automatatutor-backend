@@ -35,7 +35,7 @@ namespace AutomataPDL
             return v;
         }
 
-        public virtual Automaton<BvSet> getDFA(HashSet<Char> alphabet, CharSetSolver solver)
+        public virtual Automaton<BDD> getDFA(HashSet<Char> alphabet, CharSetSolver solver)
         {
             var ss =string.Format("^{0}$", str);
             return solver.Convert(string.Format("^{0}$",str));

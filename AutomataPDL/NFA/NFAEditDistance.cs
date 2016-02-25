@@ -15,7 +15,7 @@ namespace AutomataPDL
     public class NFAEditDistanceProvider
     {
 
-        Automaton<BvSet> nfa1;
+        Automaton<BDD> nfa1;
         HashSet<char> al; 
         CharSetSolver solver;
         long timeout;
@@ -32,7 +32,7 @@ namespace AutomataPDL
         /// <param name="al"></param>
         /// <param name="solver"></param>
         /// <param name="timeout"></param>
-        public NFAEditDistanceProvider(Automaton<BvSet> nfa1, 
+        public NFAEditDistanceProvider(Automaton<BDD> nfa1, 
             HashSet<char> al, CharSetSolver solver, long timeout)
         {
             this.nfa1 = nfa1;
@@ -56,7 +56,7 @@ namespace AutomataPDL
         /// 
         /// </summary>
         /// <returns></returns>
-        public NFAEditScript GetNFAOptimalEdit(Automaton<BvSet> nfa2)
+        public NFAEditScript GetNFAOptimalEdit(Automaton<BDD> nfa2)
         {
             NFAEditScript editScript = new NFAEditScript();           
 
@@ -119,7 +119,7 @@ namespace AutomataPDL
         // returns true if timeout
         internal bool GetNFAEditScriptTimeout(
             int depth, long lastEditHash, 
-            Automaton<BvSet> currentNfa2,
+            Automaton<BDD> currentNfa2,
             List<NFAEdit> editList, int scriptCost,
             NFAEditScript bestScript)
         {
@@ -151,20 +151,20 @@ namespace AutomataPDL
                     //flip its final non final status
 
                     var newFinalStates = new HashSet<int>(currentNfa2.GetFinalStates());
-                    Automaton<BvSet> nfa2new = null;
+                    Automaton<BDD> nfa2new = null;
                     if (currentNfa2.GetFinalStates().Contains(state))
                     {
                         edit = new NFAEditState(state, false);
                         editList.Insert(0, edit);
                         newFinalStates.Remove(state);
-                        nfa2new = Automaton<BvSet>.Create(currentNfa2.InitialState, newFinalStates, currentNfa2.GetMoves());
+                        nfa2new = Automaton<BDD>.Create(currentNfa2.InitialState, newFinalStates, currentNfa2.GetMoves());
                     }
                     else
                     {
                         edit = new NFAEditState(state, true);
                         editList.Insert(0, edit);
                         newFinalStates.Add(state);
-                        nfa2new = Automaton<BvSet>.Create(currentNfa2.InitialState, newFinalStates, currentNfa2.GetMoves());
+                        nfa2new = Automaton<BDD>.Create(currentNfa2.InitialState, newFinalStates, currentNfa2.GetMoves());
                     }
 
                     if (GetNFAEditScriptTimeout(depth - 1, thisEditHash, nfa2new, editList, scriptCost + edit.GetCost(), bestScript))
@@ -189,28 +189,28 @@ namespace AutomataPDL
                         thisEditHash = currentNfa2.StateCount + moveHash;
                         if (CanAdd(thisEditHash, lastEditHash))
                         {
-                            BvSet cCond = solver.False;
-                            BvSet newCond = solver.False;
+                            BDD cCond = solver.False;
+                            BDD newCond = solver.False;
 
                             //skip epsilon moves
-                            if (moveFromSource.Condition != null)
+                            if (moveFromSource.Label != null)
                             {
                                 // if c in move, remove it and recursion
-                                if (solver.Contains(moveFromSource.Condition, c))
+                                if (solver.Contains(moveFromSource.Label, c))
                                 {
                                     cCond = solver.MkNot(solver.MkCharConstraint(false, c));
-                                    newCond = solver.MkAnd(moveFromSource.Condition, cCond);
+                                    newCond = solver.MkAnd(moveFromSource.Label, cCond);
                                 }
                                 else // if c not in move, add it and recursion
                                 {
                                     cCond = solver.MkCharConstraint(false, c);
-                                    newCond = solver.MkOr(moveFromSource.Condition, cCond);
+                                    newCond = solver.MkOr(moveFromSource.Label, cCond);
                                 }
 
-                                var newMoves = new List<Move<BvSet>>(currentNfa2.GetMoves());
+                                var newMoves = new List<Move<BDD>>(currentNfa2.GetMoves());
                                 newMoves.Remove(moveFromSource);
-                                newMoves.Add(new Move<BvSet>(sourceState, moveFromSource.TargetState, newCond));
-                                var nfa2new = Automaton<BvSet>.Create(currentNfa2.InitialState, currentNfa2.GetFinalStates(), newMoves);
+                                newMoves.Add(new Move<BDD>(sourceState, moveFromSource.TargetState, newCond));
+                                var nfa2new = Automaton<BDD>.Create(currentNfa2.InitialState, currentNfa2.GetFinalStates(), newMoves);
 
                                 edit = new NFAEditMove(sourceState, moveFromSource.TargetState, c);
                                 editList.Insert(0, edit);
@@ -235,9 +235,9 @@ namespace AutomataPDL
                         thisEditHash = currentNfa2.StateCount + moveHash;
 
                         var moveCond = solver.MkCharConstraint(false, c);
-                        var newMoves = new List<Move<BvSet>>(currentNfa2.GetMoves()); 
-                        newMoves.Add(new Move<BvSet>(sourceState, targetState, moveCond));
-                        var nfa2new = Automaton<BvSet>.Create(currentNfa2.InitialState, currentNfa2.GetFinalStates(), newMoves);
+                        var newMoves = new List<Move<BDD>>(currentNfa2.GetMoves()); 
+                        newMoves.Add(new Move<BDD>(sourceState, targetState, moveCond));
+                        var nfa2new = Automaton<BDD>.Create(currentNfa2.InitialState, currentNfa2.GetFinalStates(), newMoves);
 
                         edit = new NFAEditMove(sourceState, targetState, c);
                         editList.Insert(0, edit);
@@ -258,7 +258,7 @@ namespace AutomataPDL
         // Returns first collapse edit found that shrinks nfa2
         // Returns null if none found
         // Returns null if nfa2 is not equivalent with nfa1
-        public NFAEdit NFACollapseSearch(Automaton<BvSet> nfa2)
+        public NFAEdit NFACollapseSearch(Automaton<BDD> nfa2)
         {
             //Makes sure the two nfas are equivalent
             if(!nfa1.IsEquivalentWith(nfa2, solver))
@@ -295,10 +295,10 @@ namespace AutomataPDL
             return thisEditHash > lastEditHash;
         }
 
-        private static BvSet BvSetOf(IEnumerable<char> alphabet, CharSetSolver solver)
+        private static BDD BDDOf(IEnumerable<char> alphabet, CharSetSolver solver)
         {
             bool fst = true;
-            BvSet safeCharCond = null;
+            BDD safeCharCond = null;
             foreach (var c in alphabet)
                 if (fst)
                 {

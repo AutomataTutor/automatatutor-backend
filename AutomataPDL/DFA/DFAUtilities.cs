@@ -15,7 +15,7 @@ namespace AutomataPDL
 {
     public static class DFAUtilities
     {
-        public static Pair<HashSet<char>, Automaton<BvSet>> parseDFAFromString(string str, CharSetSolver solver)
+        public static Pair<HashSet<char>, Automaton<BDD>> parseDFAFromString(string str, CharSetSolver solver)
         {
             var lines = Regex.Split(str, "\r\n|\r|\n");
             HashSet<char> al = new HashSet<char>();
@@ -31,18 +31,18 @@ namespace AutomataPDL
             for (int i = 2; i < tokens.Length; i++)
                 finalStates.Add(Convert.ToInt32(tokens[i]));
 
-            var moves = new List<Move<BvSet>>();
+            var moves = new List<Move<BDD>>();
             for (int i = 3; i < lines.Length; i++)
             {
                 tokens = lines[i].Split(new char[] { ',' });
                 if (tokens.Length > 1)
-                    moves.Add(new Move<BvSet>(Convert.ToInt32(tokens[0]), Convert.ToInt32(tokens[1]), solver.MkCharConstraint(false, tokens[2].ToCharArray()[0])));
+                    moves.Add(new Move<BDD>(Convert.ToInt32(tokens[0]), Convert.ToInt32(tokens[1]), solver.MkCharConstraint(false, tokens[2].ToCharArray()[0])));
             }
 
-            return new Pair<HashSet<char>, Automaton<BvSet>>(al, Automaton<BvSet>.Create(0, finalStates, moves));
+            return new Pair<HashSet<char>, Automaton<BDD>>(al, Automaton<BDD>.Create(0, finalStates, moves));
         }
 
-        public static Pair<HashSet<char>, Automaton<BvSet>> parseDFAFromXML(XElement Automaton1, CharSetSolver solver)
+        public static Pair<HashSet<char>, Automaton<BDD>> parseDFAFromXML(XElement Automaton1, CharSetSolver solver)
         {
             HashSet<char> al = new HashSet<char>();
             //XElement Automaton = XElement.Parse(xmlString);
@@ -50,7 +50,7 @@ namespace AutomataPDL
             //All DFAs in problem set on automata tutor are over a,b
             
 
-            var moves = new List<Move<BvSet>>();
+            var moves = new List<Move<BDD>>();
             var finalStates = new List<int>();
             int start = 0;
 
@@ -62,7 +62,7 @@ namespace AutomataPDL
             {
                 if (child.Name == "transition")
                 {
-                    moves.Add(new Move<BvSet>(Convert.ToInt32(child.Element("from").Value), Convert.ToInt32(child.Element("to").Value),
+                    moves.Add(new Move<BDD>(Convert.ToInt32(child.Element("from").Value), Convert.ToInt32(child.Element("to").Value),
                         solver.MkCharConstraint(false, Convert.ToChar(child.Element("read").Value))));
                     al.Add(Convert.ToChar(child.Element("read").Value));
                 }
@@ -86,15 +86,15 @@ namespace AutomataPDL
                 }
             }
 
-            return new Pair<HashSet<char>, Automaton<BvSet>>(al, Automaton<BvSet>.Create(start, finalStates, moves));
+            return new Pair<HashSet<char>, Automaton<BDD>>(al, Automaton<BDD>.Create(start, finalStates, moves));
 
         }
 
-        public static Pair<HashSet<char>, Automaton<BvSet>> parseNFAFromXML(XElement Automaton1, CharSetSolver solver)
+        public static Pair<HashSet<char>, Automaton<BDD>> parseNFAFromXML(XElement Automaton1, CharSetSolver solver)
         {
             HashSet<char> al = new HashSet<char>();
 
-            var moves = new List<Move<BvSet>>();
+            var moves = new List<Move<BDD>>();
             var finalStates = new List<int>();
             int start = 0;
 
@@ -116,10 +116,10 @@ namespace AutomataPDL
                 {
                     char element = Convert.ToChar(child.Element("read").Value);
                     if (element != 'ε' && element != '?')
-                        moves.Add(new Move<BvSet>(Convert.ToInt32(child.Element("from").Value), Convert.ToInt32(child.Element("to").Value),
+                        moves.Add(new Move<BDD>(Convert.ToInt32(child.Element("from").Value), Convert.ToInt32(child.Element("to").Value),
                             solver.MkCharConstraint(false, element)));
                     else
-                        moves.Add(Move<BvSet>.Epsilon(Convert.ToInt32(child.Element("from").Value), Convert.ToInt32(child.Element("to").Value)));
+                        moves.Add(Move<BDD>.Epsilon(Convert.ToInt32(child.Element("from").Value), Convert.ToInt32(child.Element("to").Value)));
 
                     
                 }
@@ -143,13 +143,13 @@ namespace AutomataPDL
                 }
             }
 
-            return new Pair<HashSet<char>, Automaton<BvSet>>(al, Automaton<BvSet>.Create(start, finalStates, moves));
+            return new Pair<HashSet<char>, Automaton<BDD>>(al, Automaton<BDD>.Create(start, finalStates, moves));
 
         }
 
-        public static Automaton<BvSet> parseForTest(string Automaton1, CharSetSolver solver)
+        public static Automaton<BDD> parseForTest(string Automaton1, CharSetSolver solver)
         {           
-            var moves = new List<Move<BvSet>>();
+            var moves = new List<Move<BDD>>();
             var finalStates = new List<int>();
             int start = 0;
 
@@ -161,7 +161,7 @@ namespace AutomataPDL
             {
                 if (child.Name == "transition")
                 {
-                    moves.Add(new Move<BvSet>(Convert.ToInt32(child.Element("from").Value), Convert.ToInt32(child.Element("to").Value),
+                    moves.Add(new Move<BDD>(Convert.ToInt32(child.Element("from").Value), Convert.ToInt32(child.Element("to").Value),
                         solver.MkCharConstraint(false, Convert.ToChar(child.Element("read").Value))));
                 }
             }
@@ -184,11 +184,11 @@ namespace AutomataPDL
                 }
             }
 
-            return Automaton<BvSet>.Create(start, finalStates, moves);
+            return Automaton<BDD>.Create(start, finalStates, moves);
 
         }
 
-        public static Pair<HashSet<char>, Automaton<BvSet>> parseRegexFromXML(XElement regex, XElement alphabet, CharSetSolver solver)
+        public static Pair<HashSet<char>, Automaton<BDD>> parseRegexFromXML(XElement regex, XElement alphabet, CharSetSolver solver)
         {
             HashSet<char> al = new HashSet<char>();
             XElement xmlAlphabet = XElement.Parse(RemoveAllNamespaces(alphabet.ToString()));
@@ -215,7 +215,7 @@ namespace AutomataPDL
             string rexpr = Regex.Value.Trim();
 
             var escapedRexpr = string.Format(@"^({0})$",rexpr);
-            Automaton<BvSet> aut = null;
+            Automaton<BDD> aut = null;
             try
             {
                 aut = solver.Convert(escapedRexpr);
@@ -236,11 +236,11 @@ namespace AutomataPDL
                 throw new PDLException(
                     "The regular expression should only accept strings over ("+alRex+")*. Yours accepts the string '"+DFAUtilities.GenerateShortTerm(diff.Determinize(solver),solver)+"'");
 
-            return new Pair<HashSet<char>, Automaton<BvSet>>(al, aut);
+            return new Pair<HashSet<char>, Automaton<BDD>>(al, aut);
 
         }
 
-        public static Pair<HashSet<char>, Automaton<BvSet>> parseDFAFromJFLAP(string fileName, CharSetSolver solver)
+        public static Pair<HashSet<char>, Automaton<BDD>> parseDFAFromJFLAP(string fileName, CharSetSolver solver)
         {
             
             HashSet<char> al = new HashSet<char>();
@@ -251,7 +251,7 @@ namespace AutomataPDL
 
             XElement Automaton = Structure.Element("automaton");
 
-            var moves = new List<Move<BvSet>>();
+            var moves = new List<Move<BDD>>();
             var finalStates = new List<int>();
             int start = -1;
 
@@ -271,16 +271,16 @@ namespace AutomataPDL
                 if (child.Name == "transition")
                 {
                     al.Add(Convert.ToChar(child.Element("read").Value));
-                    moves.Add(new Move<BvSet>(Convert.ToInt32(child.Element("from").Value), Convert.ToInt32(child.Element("to").Value),
+                    moves.Add(new Move<BDD>(Convert.ToInt32(child.Element("from").Value), Convert.ToInt32(child.Element("to").Value),
                         solver.MkCharConstraint(false, Convert.ToChar(child.Element("read").Value))));
                 }
             }
 
             Debug.Assert(start != -1);
-            return new Pair<HashSet<char>, Automaton<BvSet>>(al, Automaton<BvSet>.Create(start, finalStates, moves));
+            return new Pair<HashSet<char>, Automaton<BDD>>(al, Automaton<BDD>.Create(start, finalStates, moves));
         }
 
-        //public static Pair<HashSet<char>, Automaton<BvSet>> parseDFAfromTutor(string fileName, CharSetSolver solver)
+        //public static Pair<HashSet<char>, Automaton<BDD>> parseDFAfromTutor(string fileName, CharSetSolver solver)
         //{
         //    HashSet<char> al = new HashSet<char>();
         //    XElement Automaton = XElement.Load(fileName);
@@ -289,7 +289,7 @@ namespace AutomataPDL
         //    al.Add('a');
         //    al.Add('b');
 
-        //    var moves = new List<Move<BvSet>>();
+        //    var moves = new List<Move<BDD>>();
         //    var finalStates = new List<int>();
         //    int start = 0;
 
@@ -299,7 +299,7 @@ namespace AutomataPDL
         //    {
         //        if (child.Name == "transition")
         //        {
-        //            moves.Add(new Move<BvSet>(Convert.ToInt32(child.Element("from").Value), Convert.ToInt32(child.Element("to").Value),
+        //            moves.Add(new Move<BDD>(Convert.ToInt32(child.Element("from").Value), Convert.ToInt32(child.Element("to").Value),
         //                solver.MkCharConstraint(false, Convert.ToChar(child.Element("read").Value))));
         //        }
         //    }
@@ -313,11 +313,11 @@ namespace AutomataPDL
         //        }
         //    }
 
-        //    return new Pair<HashSet<char>, Automaton<BvSet>>(al, Automaton<BvSet>.Create(start, finalStates, moves));
+        //    return new Pair<HashSet<char>, Automaton<BDD>>(al, Automaton<BDD>.Create(start, finalStates, moves));
 
         //}
 
-        //public static Pair<HashSet<char>, Automaton<BvSet>> parseDFAfromEvent(string fileName, CharSetSolver solver)
+        //public static Pair<HashSet<char>, Automaton<BDD>> parseDFAfromEvent(string fileName, CharSetSolver solver)
         //{
         //    HashSet<char> al = new HashSet<char>();
         //    XElement Event = XElement.Load(fileName);
@@ -328,7 +328,7 @@ namespace AutomataPDL
         //    al.Add('a');
         //    al.Add('b');
 
-        //    var moves = new List<Move<BvSet>>();
+        //    var moves = new List<Move<BDD>>();
         //    var finalStates = new List<int>();
         //    int start = 0;
 
@@ -338,7 +338,7 @@ namespace AutomataPDL
         //    {
         //        if (child.Name == "transition")
         //        {
-        //            moves.Add(new Move<BvSet>(Convert.ToInt32(child.Element("from").Value), Convert.ToInt32(child.Element("to").Value),
+        //            moves.Add(new Move<BDD>(Convert.ToInt32(child.Element("from").Value), Convert.ToInt32(child.Element("to").Value),
         //                solver.MkCharConstraint(false, Convert.ToChar(child.Element("read").Value))));
         //        }
         //    }
@@ -352,7 +352,7 @@ namespace AutomataPDL
         //        }
         //    }
 
-        //    return new Pair<HashSet<char>, Automaton<BvSet>>(al, Automaton<BvSet>.Create(start, finalStates, moves));
+        //    return new Pair<HashSet<char>, Automaton<BDD>>(al, Automaton<BDD>.Create(start, finalStates, moves));
 
         //}
 
@@ -367,7 +367,7 @@ namespace AutomataPDL
             return Automaton1.ToString() == Automaton2.ToString();
         }
 
-        public static void printDFA(Automaton<BvSet> dfa, HashSet<char> alphabet, StringBuilder sb)
+        public static void printDFA(Automaton<BDD> dfa, HashSet<char> alphabet, StringBuilder sb)
         {
             var newDfa = normalizeDFA(dfa).First;
 
@@ -388,7 +388,7 @@ namespace AutomataPDL
             foreach (var move in newDfa.GetMoves())
             {
 
-                List<char> chars = move.Condition==null? new List<char>() : solver.GenerateAllCharacters(move.Condition, false).ToList();
+                List<char> chars = move.Label==null? new List<char>() : solver.GenerateAllCharacters(move.Label, false).ToList();
                 chars.Sort();
                 foreach (var ch in chars)
                 {
@@ -397,7 +397,7 @@ namespace AutomataPDL
             }
         }
 
-        //public static Pair<Automaton<BvSet>, HashSet<char>> readDFA(string )
+        //public static Pair<Automaton<BDD>, HashSet<char>> readDFA(string )
         //{            
         //    CharSetSolver solver = new CharSetSolver(BitWidth.BV64);
 
@@ -416,7 +416,7 @@ namespace AutomataPDL
 
         //    foreach (var move in newDfa.GetMoves())
         //    {
-        //        var chars = solver.GenerateAllCharacters(move.Condition, false).ToList();
+        //        var chars = solver.GenerateAllCharacters(move.Label, false).ToList();
         //        chars.Sort();
         //        foreach (var ch in chars)
         //        {
@@ -455,7 +455,7 @@ namespace AutomataPDL
         #endregion
 
         #region canonical state names
-        public static Pair<Automaton<BvSet>,Dictionary<int,int>> normalizeDFA(Automaton<BvSet> dfa)
+        public static Pair<Automaton<BDD>,Dictionary<int,int>> normalizeDFA(Automaton<BDD> dfa)
         {
             Dictionary<int, int> stateToNewNames = new Dictionary<int, int>();
             Dictionary<int, int> newNamesToStates = new Dictionary<int, int>();
@@ -473,14 +473,14 @@ namespace AutomataPDL
                 newFinalStates.Add(stateToNewNames[st]);
 
             var oldMoves = dfa.GetMoves();
-            var newMoves = new List<Move<BvSet>>();
+            var newMoves = new List<Move<BDD>>();
             foreach (var move in oldMoves)
-                newMoves.Add(new Move<BvSet>(stateToNewNames[move.SourceState], stateToNewNames[move.TargetState], move.Condition));
+                newMoves.Add(new Move<BDD>(stateToNewNames[move.SourceState], stateToNewNames[move.TargetState], move.Label));
 
-            return new Pair<Automaton<BvSet>, Dictionary<int, int>>(Automaton<BvSet>.Create(0, newFinalStates, newMoves), newNamesToStates);
+            return new Pair<Automaton<BDD>, Dictionary<int, int>>(Automaton<BDD>.Create(0, newFinalStates, newMoves), newNamesToStates);
         }
 
-        private static List<int> dfsStartingTimes(Automaton<BvSet> dfa)
+        private static List<int> dfsStartingTimes(Automaton<BDD> dfa)
         {
             List<int> order = new List<int>();
 
@@ -500,16 +500,16 @@ namespace AutomataPDL
             return order;
         }
 
-        private static void dfsRecStartingTimes(Automaton<BvSet> dfa, int currState, HashSet<int> discovered, List<int> order)
+        private static void dfsRecStartingTimes(Automaton<BDD> dfa, int currState, HashSet<int> discovered, List<int> order)
         {
             order.Add(currState);
-            List<Move<BvSet>> moves = new List<Move<BvSet>>(dfa.GetMovesFrom(currState));
-            moves.Sort(delegate(Move<BvSet> c1, Move<BvSet> c2) {
-                if(c1.Condition==null)
+            List<Move<BDD>> moves = new List<Move<BDD>>(dfa.GetMovesFrom(currState));
+            moves.Sort(delegate(Move<BDD> c1, Move<BDD> c2) {
+                if(c1.Label==null)
                     return 1;
-                if (c2.Condition == null)
+                if (c2.Label == null)
                     return -1;
-                return c1.Condition.ToString().CompareTo(c2.Condition.ToString());
+                return c1.Label.ToString().CompareTo(c2.Label.ToString());
             });
             foreach (var move in moves)
                 if (!discovered.Contains(move.TargetState))
@@ -522,14 +522,14 @@ namespace AutomataPDL
 
         #region TestSet Generation with Myhill-Nerode
         //returns a pair of string enumerable of positive and negative test set respectively
-        internal static Pair<IEnumerable<string>, IEnumerable<string>> MyHillTestGeneration(HashSet<char> alphabet, Automaton<BvSet> dfa, CharSetSolver solver)
+        internal static Pair<IEnumerable<string>, IEnumerable<string>> MyHillTestGeneration(HashSet<char> alphabet, Automaton<BDD> dfa, CharSetSolver solver)
         {
-            Automaton<BvSet> normDfa = normalizeDFA(dfa).First;                       
+            Automaton<BDD> normDfa = normalizeDFA(dfa).First;                       
 
             HashSet<string> pos = new HashSet<string>();
             HashSet<string> neg = new HashSet<string>();
 
-            Automaton<BvSet> ait, bif, bjf, adif;
+            Automaton<BDD> ait, bif, bjf, adif;
             HashSet<string> testSet = new HashSet<string>();
             var finStates = normDfa.GetFinalStates();
 
@@ -539,14 +539,14 @@ namespace AutomataPDL
             #region Compute ai and bij
             foreach (var state1 in normDfa.States)
             {
-                ait = Automaton<BvSet>.Create(normDfa.InitialState, new int[] { state1 }, normDfa.GetMoves());
+                ait = Automaton<BDD>.Create(normDfa.InitialState, new int[] { state1 }, normDfa.GetMoves());
                 a[state1] = GenerateShortTerm(ait, solver);
 
-                bif = Automaton<BvSet>.Create(state1, finStates, normDfa.GetMoves());
+                bif = Automaton<BDD>.Create(state1, finStates, normDfa.GetMoves());
 
                 foreach (var state2 in normDfa.States)
                 {
-                    bjf = Automaton<BvSet>.Create(state2, finStates, new List<Move<BvSet>>(normDfa.GetMoves()));
+                    bjf = Automaton<BDD>.Create(state2, finStates, new List<Move<BDD>>(normDfa.GetMoves()));
 
                     adif = bif.Minus(bjf, solver).Determinize(solver).Minimize(solver);
 
@@ -576,16 +576,16 @@ namespace AutomataPDL
         }
 
         // returns the state reached from currState when reading c
-        private static int GetNextState(int currState, char c, Automaton<BvSet> dfa, CharSetSolver solver)
+        private static int GetNextState(int currState, char c, Automaton<BDD> dfa, CharSetSolver solver)
         {
             foreach (var move in dfa.GetNonepsilonMovesFrom(currState))
-                if (solver.IsSatisfiable(solver.MkAnd(move.Condition, solver.MkCharConstraint(false, c))))
+                if (solver.IsSatisfiable(solver.MkAnd(move.Label, solver.MkCharConstraint(false, c))))
                     return move.TargetState;
 
             return -1;
         }
 
-        internal static string GenerateShortTerm(Automaton<BvSet> dfa, CharSetSolver solver)
+        internal static string GenerateShortTerm(Automaton<BDD> dfa, CharSetSolver solver)
         {
             if (dfa.IsEmpty)
                 return null;
@@ -618,13 +618,13 @@ namespace AutomataPDL
                         reachedStates.Add(move.TargetState);
                         toExplore.Add(move.TargetState);
 
-                        if (move.Condition == null)
+                        if (move.Label == null)
                         {
                             shortStr.Add(move.TargetState, sCurr);
                         }
                         else
                         {
-                            foreach (var v in solver.GenerateAllCharacters(move.Condition, false))
+                            foreach (var v in solver.GenerateAllCharacters(move.Label, false))
                             {
                                 condC = v;
                                 break;
@@ -646,7 +646,7 @@ namespace AutomataPDL
         #region TestSet Generation with enumeration
 
         public static Pair<List<string>, List<string>> GetTestSets(
-            Automaton<BvSet> dfa, HashSet<char> alphabet, CharSetSolver solver)
+            Automaton<BDD> dfa, HashSet<char> alphabet, CharSetSolver solver)
         {
             List<string> positive = new List<string>();
             List<string> negative = new List<string>();
@@ -661,7 +661,7 @@ namespace AutomataPDL
 
         internal static void ComputeModels(
             string currStr, int currState,
-            Automaton<BvSet> dfa, List<int> finalStates, HashSet<char> alphabet, CharSetSolver solver,
+            Automaton<BDD> dfa, List<int> finalStates, HashSet<char> alphabet, CharSetSolver solver,
             List<string> positive, List<string> negative)
         {
             if (currStr.Length >= 8)
@@ -681,7 +681,7 @@ namespace AutomataPDL
                     bool found = false;
                     foreach (var move in dfa.GetMovesFrom(currState))
                     {
-                        if (solver.IsSatisfiable(solver.MkAnd(move.Condition, solver.MkCharConstraint(false, ch))))
+                        if (solver.IsSatisfiable(solver.MkAnd(move.Label, solver.MkCharConstraint(false, ch))))
                         {
                             found = true;
                             ComputeModels(currStr + ch, move.TargetState, dfa, finalStates, alphabet, solver, positive, negative);
@@ -698,7 +698,7 @@ namespace AutomataPDL
 
         //Compute strings in cycles
         #region Compute strings in cycles
-        internal static HashSet<string> getLoopingStrings(Automaton<BvSet> dfa, HashSet<Char> al, CharSetSolver solver)
+        internal static HashSet<string> getLoopingStrings(Automaton<BDD> dfa, HashSet<Char> al, CharSetSolver solver)
         {
             var cycles = getSimpleCycles(dfa);
             HashSet<string> strings = new HashSet<string>();
@@ -712,7 +712,7 @@ namespace AutomataPDL
         }
 
         // gets string that forms the loop path given as a list of states
-        private static void getPathStrings(Automaton<BvSet> dfa, CharSetSolver solver, List<int> path, string currStr, HashSet<string> strings, int prevState)
+        private static void getPathStrings(Automaton<BDD> dfa, CharSetSolver solver, List<int> path, string currStr, HashSet<string> strings, int prevState)
         {
             List<int> path1 = new List<int>(path);
             var currState = path1.ElementAt(0);
@@ -721,7 +721,7 @@ namespace AutomataPDL
             foreach (var move in dfa.GetMovesFrom(prevState))
                 if (move.TargetState == currState)
                 {
-                    if (move.Condition == null)
+                    if (move.Label == null)
                     {
                         if (path1.Count == 0)
                             strings.Add(currStr);
@@ -729,7 +729,7 @@ namespace AutomataPDL
                             getPathStrings(dfa, solver, path1, currStr, strings, currState);
                     }
                     else
-                        foreach (char c in solver.GenerateAllCharacters(move.Condition, false))
+                        foreach (char c in solver.GenerateAllCharacters(move.Label, false))
                             if (path1.Count == 0)
                                 strings.Add(currStr + c);
                             else
@@ -741,7 +741,7 @@ namespace AutomataPDL
 
         // Accessory methods for SCC and cycles
         #region Accessory methods for SCC and cycles
-        internal static HashSet<int> getCyclesLengths(Automaton<BvSet> dfa)
+        internal static HashSet<int> getCyclesLengths(Automaton<BDD> dfa)
         {
             HashSet<int> lengths = new HashSet<int>();
             var sccs = computeSCC(dfa);
@@ -763,7 +763,7 @@ namespace AutomataPDL
         }
 
         private static void getCyclesLengthsFromNode(int length,
-            Automaton<BvSet> dfa, int currState, HashSet<int>[] found, int max)
+            Automaton<BDD> dfa, int currState, HashSet<int>[] found, int max)
         {
             if (length <= max)
                 foreach (var move in dfa.GetMovesFrom(currState))
@@ -776,7 +776,7 @@ namespace AutomataPDL
                 }
         }
 
-        private static List<int> dfsFinishingTimes(Automaton<BvSet> dfa)
+        private static List<int> dfsFinishingTimes(Automaton<BDD> dfa)
         {
             List<int> order = new List<int>();
 
@@ -795,7 +795,7 @@ namespace AutomataPDL
             return order;
         }
 
-        private static void dfsRecFinishingTimes(Automaton<BvSet> dfa, int currState, HashSet<int> discovered, List<int> order)
+        private static void dfsRecFinishingTimes(Automaton<BDD> dfa, int currState, HashSet<int> discovered, List<int> order)
         {
             foreach (var move in dfa.GetMovesFrom(currState))
             {
@@ -809,7 +809,7 @@ namespace AutomataPDL
         }
 
 
-        internal static List<HashSet<int>> computeSCC(Automaton<BvSet> dfa)
+        internal static List<HashSet<int>> computeSCC(Automaton<BDD> dfa)
         {
             List<int> order = dfsFinishingTimes(dfa);
 
@@ -831,7 +831,7 @@ namespace AutomataPDL
             return list;
         }
 
-        private static void backwardDfsRec(Automaton<BvSet> dfa, int currState, HashSet<int> discovered, HashSet<int> comp)
+        private static void backwardDfsRec(Automaton<BDD> dfa, int currState, HashSet<int> discovered, HashSet<int> comp)
         {
             foreach (var move in dfa.GetMovesTo(currState))
             {
@@ -848,7 +848,7 @@ namespace AutomataPDL
 
         // Accessory methods for strings
         #region Accessory methods for strings
-        internal static List<string> getSimplePrefixes(Automaton<BvSet> dfa, CharSetSolver solver)
+        internal static List<string> getSimplePrefixes(Automaton<BDD> dfa, CharSetSolver solver)
         {
             if (!dfa.IsEpsilonFree)
                 return new List<string>();
@@ -868,7 +868,7 @@ namespace AutomataPDL
                         if (node == move.TargetState)
                         {
                             var newStrs = new List<string>();
-                            foreach (var el in solver.GenerateAllCharacters(move.Condition, false))
+                            foreach (var el in solver.GenerateAllCharacters(move.Label, false))
                                 foreach (var str in currStrs)
                                 {
                                     newStrs.Add(str + el);
@@ -885,7 +885,7 @@ namespace AutomataPDL
             return strings;
         }
 
-        internal static List<string> getSimpleSuffixes(Automaton<BvSet> dfa, CharSetSolver solver)
+        internal static List<string> getSimpleSuffixes(Automaton<BDD> dfa, CharSetSolver solver)
         {
             if (!dfa.IsEpsilonFree)
                 return new List<string>();
@@ -907,7 +907,7 @@ namespace AutomataPDL
                         if (node == move.SourceState)
                         {
                             var newStrs = new List<string>();
-                            foreach (var el in solver.GenerateAllCharacters(move.Condition, false))
+                            foreach (var el in solver.GenerateAllCharacters(move.Label, false))
                                 foreach (var str in currStrs)
                                 {
                                     newStrs.Add(el + str);
@@ -925,7 +925,7 @@ namespace AutomataPDL
 
         }
 
-        internal static List<List<int>> getSimplePaths(Automaton<BvSet> dfa)
+        internal static List<List<int>> getSimplePaths(Automaton<BDD> dfa)
         {
             if (!dfa.IsEpsilonFree)
                 return new List<List<int>>();
@@ -937,7 +937,7 @@ namespace AutomataPDL
             return paths;
         }
 
-        internal static void getSimplePathsDFS(int currState, Automaton<BvSet> dfa, List<List<int>> paths, List<int> currPath)
+        internal static void getSimplePathsDFS(int currState, Automaton<BDD> dfa, List<List<int>> paths, List<int> currPath)
         {
             foreach (var move in dfa.GetMovesFrom(currState))
             {
@@ -953,7 +953,7 @@ namespace AutomataPDL
 
         }
 
-        internal static List<List<int>> getSimpleCycles(Automaton<BvSet> dfa)
+        internal static List<List<int>> getSimpleCycles(Automaton<BDD> dfa)
         {
             if (!dfa.IsEpsilonFree)
                 return new List<List<int>>();
@@ -968,7 +968,7 @@ namespace AutomataPDL
             return cycles;
         }
 
-        internal static void getSimpleCyclesDFS(int currState, Automaton<BvSet> dfa, List<List<int>> cycles, List<int> currPath)
+        internal static void getSimpleCyclesDFS(int currState, Automaton<BDD> dfa, List<List<int>> cycles, List<int> currPath)
         {
             foreach (var move in dfa.GetMovesFrom(currState))
             {
@@ -997,7 +997,7 @@ namespace AutomataPDL
         internal static bool ApproximateMNEquivalent(
             Pair<IEnumerable<string>, IEnumerable<string>> testSets, 
             double lanDensity,
-            Automaton<BvSet> shouldbeDfa, HashSet<char> al, CharSetSolver solver)
+            Automaton<BDD> shouldbeDfa, HashSet<char> al, CharSetSolver solver)
         {
             var dfa = shouldbeDfa;
             if(!shouldbeDfa.isDeterministic || !shouldbeDfa.IsEpsilonFree)
@@ -1032,7 +1032,7 @@ namespace AutomataPDL
         }
 
         //returns true iff dfa accepts str
-        private static bool Accepts(Automaton<BvSet> dfa1,  string str, HashSet<char> al, CharSetSolver solver)
+        private static bool Accepts(Automaton<BDD> dfa1,  string str, HashSet<char> al, CharSetSolver solver)
         {
             return solver.Accepts(dfa1, str);
 

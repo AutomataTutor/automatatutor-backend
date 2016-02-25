@@ -27,14 +27,14 @@ namespace AutomataPDL
         static HashSet<char> alph;
         static Regexp sigmaStar;
         static Regexp sigmaPlus;
-        static Dictionary<string, Automaton<BvSet>> currUnionEls;
+        static Dictionary<string, Automaton<BDD>> currUnionEls;
 
-        static Dictionary<string, Automaton<BvSet>> memoDfa;
+        static Dictionary<string, Automaton<BDD>> memoDfa;
 
         static CharSetSolver solver;
         static Stopwatch timer;
 
-        public static IEnumerable<Regexp> SynthesizeRegexp(HashSet<char> alphabet, Automaton<BvSet> dfa, CharSetSolver s, StringBuilder sb, long timeout)
+        public static IEnumerable<Regexp> SynthesizeRegexp(HashSet<char> alphabet, Automaton<BDD> dfa, CharSetSolver s, StringBuilder sb, long timeout)
         {
             using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"..\..\..\regexpenum.txt"))
             {
@@ -86,8 +86,8 @@ namespace AutomataPDL
                 var isSubset = true;
                 HashSet<string> visited = new HashSet<string>();
                 HashSet<string> newReg = new HashSet<string>();
-                currUnionEls = new Dictionary<string,Automaton<BvSet>>();
-                memoDfa = new Dictionary<string, Automaton<BvSet>>(); 
+                currUnionEls = new Dictionary<string,Automaton<BDD>>();
+                memoDfa = new Dictionary<string, Automaton<BDD>>(); 
                 List<Regexp> subsetReg = new List<Regexp>();
                 #endregion
 
@@ -338,7 +338,7 @@ namespace AutomataPDL
             return @"^" + regexp + @"$";
         }
 
-        private static Automaton<BvSet> getDfa(Regexp regexp)
+        private static Automaton<BDD> getDfa(Regexp regexp)
         {
             var re = regexp.Normalize();
             if (!memoDfa.Keys.Contains(re.ToString()))             

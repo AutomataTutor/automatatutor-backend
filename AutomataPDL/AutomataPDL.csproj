@@ -10,8 +10,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AutomataPDL</RootNamespace>
     <AssemblyName>AutomataPDL</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup>
@@ -32,6 +33,7 @@
     <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <OutputPath>bin\Release\</OutputPath>
@@ -48,22 +50,24 @@
     <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <PlatformTarget>x86</PlatformTarget>
     <OutputPath>bin\x86\Debug\</OutputPath>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <PlatformTarget>x86</PlatformTarget>
     <OutputPath>bin\x86\Release\</OutputPath>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Antlr3.Runtime">
       <HintPath>..\external\Antlr3.Runtime.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Automata, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\external\Microsoft.Automata.dll</HintPath>
+    <Reference Include="Automata">
+      <HintPath>..\external\Automata.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Z3, Version=4.3.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -89,9 +93,6 @@
     <Compile Include="DFA\DFAFeedback.cs" />
     <Compile Include="NFA\NFAEditDistance.cs" />
     <Compile Include="NFA\NFAGrading.cs" />
-    <Compile Include="Parse\PDLGrammarLexer.cs" />
-    <Compile Include="Parse\PDLGrammarParser.cs" />
-    <Compile Include="Parse\PDLParseException.cs" />
     <Compile Include="Utilities\PatternMatching.cs" />
     <Compile Include="PDL\PDLException.cs" />
     <Compile Include="DFA\DFAGrading.cs" />
@@ -108,10 +109,6 @@
     <Compile Include="Regex\Regexp.cs" />
     <Compile Include="Regex\RegexpSynthesis.cs" />
     <Compile Include="Utilities\Utilities.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Parse\PDLGrammar.g" />
-    <None Include="Parse\PDLGrammar.tokens" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MSOZ3\MSOZ3.csproj">

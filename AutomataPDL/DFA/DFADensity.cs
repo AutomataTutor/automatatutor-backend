@@ -15,14 +15,14 @@ namespace AutomataPDL
         /// Computes the ratio of the symmetric difference to the size of dfa1 enumerating paths up to length n (uses the complement if density is high)
         /// </summary>        
         /// <returns>size of ((dfa2-dfa1)+(dfa1-dfa2))/dfa1</returns>
-        public static double GetDFADifferenceRatio(Automaton<BvSet> dfa1, Automaton<BvSet> dfa2, HashSet<char> al, CharSetSolver solver)
+        public static double GetDFADifferenceRatio(Automaton<BDD> dfa1, Automaton<BDD> dfa2, HashSet<char> al, CharSetSolver solver)
         {
             var solutionDensity = DFADensity.GetDFADensity(dfa1, al, solver);
 
             //Symmetric difference
             var dfadiff1 = dfa1.Minus(dfa2, solver);
             var dfadiff2 = dfa2.Minus(dfa1, solver);
-            var dfatrue = Automaton<BvSet>.Create(0, new int[] { 0 }, new Move<BvSet>[] { new Move<BvSet>(0, 0, solver.True) });
+            var dfatrue = Automaton<BDD>.Create(0, new int[] { 0 }, new Move<BDD>[] { new Move<BDD>(0, 0, solver.True) });
             var dfadiff = dfatrue.Minus(dfatrue.Minus(dfadiff1, solver).Intersect(dfatrue.Minus(dfadiff2, solver), solver), solver).Determinize(solver).Minimize(solver);
 
             //Use smallest of |dfa1| and complement of |dfa1| for cardinality base
@@ -33,7 +33,7 @@ namespace AutomataPDL
         /// Computes the ratio of two dfas
         /// </summary>        
         /// <returns>size of dfa2/ size of dfa1</returns>
-        internal static double GetDFARatio(Automaton<BvSet> dfa1, Automaton<BvSet> dfa2, HashSet<char> al, CharSetSolver solver, bool isSolDense)
+        internal static double GetDFARatio(Automaton<BDD> dfa1, Automaton<BDD> dfa2, HashSet<char> al, CharSetSolver solver, bool isSolDense)
         {
             var n = dfa1.StateCount;
 
@@ -67,7 +67,7 @@ namespace AutomataPDL
         /// Computes the approximate denstity of dfa
         /// </summary>        
         /// <returns>size of dfa2/ size of dfa1</returns>
-        internal static double GetDFADensity(Automaton<BvSet> dfa, HashSet<char> al, CharSetSolver solver)
+        internal static double GetDFADensity(Automaton<BDD> dfa, HashSet<char> al, CharSetSolver solver)
         {
             var n = dfa.StateCount;
 
@@ -87,7 +87,7 @@ namespace AutomataPDL
         }
 
         // returns an array where a[n] is the number of paths of length n
-        private static double[] GetPathsUpToN(Automaton<BvSet> dfa, HashSet<char> al, CharSetSolver solver, int n)
+        private static double[] GetPathsUpToN(Automaton<BDD> dfa, HashSet<char> al, CharSetSolver solver, int n)
         {
             var normDfa1 = DFAUtilities.normalizeDFA(dfa).First;
 
@@ -116,10 +116,10 @@ namespace AutomataPDL
                         {
                             int size = 0;
                             //Check if epsilon transition
-                            if (move.Condition == null)
+                            if (move.Label == null)
                                 size = 1;
                             else
-                                foreach (var v in solver.GenerateAllCharacters(move.Condition, false))
+                                foreach (var v in solver.GenerateAllCharacters(move.Label, false))
                                     size++;
 
                             pathNum[move.TargetState] += oldPathNum[state] * size;

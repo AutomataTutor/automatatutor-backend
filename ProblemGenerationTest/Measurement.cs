@@ -7,7 +7,7 @@ namespace Measurement
     public class MeasurementResultSet
     {
         public readonly PDLPred originalFormula;
-        public readonly Automaton<BvSet> originalAutomaton;
+        public readonly Automaton<BDD> originalAutomaton;
         public readonly HashSet<char> alphabet;
 
         public readonly List<SingleMeasurementResult> results;
@@ -21,7 +21,7 @@ namespace Measurement
 
         public MeasurementResultSet(PDLPred originalFormula, IEnumerable<PDLPred> generatedFormulas, long time, VariableCache.ConstraintMode constraintmode, 
             PdlFilter.Filtermode filtermode, HashSet<char> alphabet, IDictionary<PDLPred, SingleMeasurementResult> cache,
-            IDictionary<Automaton<BvSet>, SingleMeasurementResult> automatonCache)
+            IDictionary<Automaton<BDD>, SingleMeasurementResult> automatonCache)
         {
             this.originalFormula = originalFormula;
             this.alphabet = alphabet;
@@ -108,10 +108,10 @@ namespace Measurement
         public readonly int editDistance;
         public readonly double densityDiff;
 
-        public static SingleMeasurementResult Create(Automaton<BvSet> originalAutomaton, PDLPred generatedFormula, HashSet<char> alphabet, IDictionary<Automaton<BvSet>, SingleMeasurementResult> cache)
+        public static SingleMeasurementResult Create(Automaton<BDD> originalAutomaton, PDLPred generatedFormula, HashSet<char> alphabet, IDictionary<Automaton<BDD>, SingleMeasurementResult> cache)
         {
             CharSetSolver solver = new CharSetSolver();
-            Automaton<BvSet> generatedAutomaton = generatedFormula.GetDFA(alphabet, solver);
+            Automaton<BDD> generatedAutomaton = generatedFormula.GetDFA(alphabet, solver);
             SingleMeasurementResult returnValue;
             if (cache.ContainsKey(generatedAutomaton))
             {
@@ -127,7 +127,7 @@ namespace Measurement
             return returnValue;
         }
 
-        private SingleMeasurementResult(Automaton<BvSet> originalAutomaton, PDLPred generatedFormula, Automaton<BvSet> generatedAutomaton, HashSet<char> alphabet)
+        private SingleMeasurementResult(Automaton<BDD> originalAutomaton, PDLPred generatedFormula, Automaton<BDD> generatedAutomaton, HashSet<char> alphabet)
         {
             this.generatedFormula = generatedFormula;
             CharSetSolver solver = new CharSetSolver();

@@ -28,39 +28,39 @@ namespace TestPDL
 
             var a = solver.MkCharConstraint(false, 'a');
             var b = solver.MkCharConstraint(false, 'b');
-            var moves = new List<Move<BvSet>>();
+            var moves = new List<Move<BDD>>();
 
-            moves.Add(new Move<BvSet>(0, 0, a));
-            moves.Add(new Move<BvSet>(0, 1, b));
-            moves.Add(new Move<BvSet>(1, 1, b));
-            moves.Add(new Move<BvSet>(1, 2, a));
-            moves.Add(new Move<BvSet>(2, 2, a));
-            moves.Add(new Move<BvSet>(2, 3, b));
-            moves.Add(new Move<BvSet>(3, 3, b));
-            moves.Add(new Move<BvSet>(3, 4, a));
-            moves.Add(new Move<BvSet>(4, 4, a));
-            moves.Add(new Move<BvSet>(4, 5, b));
-            moves.Add(new Move<BvSet>(5, 6, a));
-            moves.Add(new Move<BvSet>(5, 5, b));
-            moves.Add(new Move<BvSet>(6, 6, a));
-            moves.Add(new Move<BvSet>(6, 6, b));
+            moves.Add(new Move<BDD>(0, 0, a));
+            moves.Add(new Move<BDD>(0, 1, b));
+            moves.Add(new Move<BDD>(1, 1, b));
+            moves.Add(new Move<BDD>(1, 2, a));
+            moves.Add(new Move<BDD>(2, 2, a));
+            moves.Add(new Move<BDD>(2, 3, b));
+            moves.Add(new Move<BDD>(3, 3, b));
+            moves.Add(new Move<BDD>(3, 4, a));
+            moves.Add(new Move<BDD>(4, 4, a));
+            moves.Add(new Move<BDD>(4, 5, b));
+            moves.Add(new Move<BDD>(5, 6, a));
+            moves.Add(new Move<BDD>(5, 5, b));
+            moves.Add(new Move<BDD>(6, 6, a));
+            moves.Add(new Move<BDD>(6, 6, b));
 
-            var dfa1 = Automaton<BvSet>.Create(0, new int[] { 4,5 }, moves);
+            var dfa1 = Automaton<BDD>.Create(0, new int[] { 4,5 }, moves);
 
-            var moves1 = new List<Move<BvSet>>();
+            var moves1 = new List<Move<BDD>>();
 
-            moves1.Add(new Move<BvSet>(0, 0, a));
-            moves1.Add(new Move<BvSet>(0, 1, b));
-            moves1.Add(new Move<BvSet>(1, 1, b));
-            moves1.Add(new Move<BvSet>(1, 2, a));
-            moves1.Add(new Move<BvSet>(2, 2, a));
-            moves1.Add(new Move<BvSet>(2, 3, b));
-            moves1.Add(new Move<BvSet>(3, 3, b));
-            moves1.Add(new Move<BvSet>(3, 4, a));
-            moves1.Add(new Move<BvSet>(4, 4, a));
-            moves1.Add(new Move<BvSet>(4, 4, b));
+            moves1.Add(new Move<BDD>(0, 0, a));
+            moves1.Add(new Move<BDD>(0, 1, b));
+            moves1.Add(new Move<BDD>(1, 1, b));
+            moves1.Add(new Move<BDD>(1, 2, a));
+            moves1.Add(new Move<BDD>(2, 2, a));
+            moves1.Add(new Move<BDD>(2, 3, b));
+            moves1.Add(new Move<BDD>(3, 3, b));
+            moves1.Add(new Move<BDD>(3, 4, a));
+            moves1.Add(new Move<BDD>(4, 4, a));
+            moves1.Add(new Move<BDD>(4, 4, b));
 
-            var dfa2 = Automaton<BvSet>.Create(0, new int[] { 4 }, moves1);         
+            var dfa2 = Automaton<BDD>.Create(0, new int[] { 4 }, moves1);         
 
             var v1 = DFAGrading.GetGrade(dfa1, dfa2, al, solver, timeout, 10, FeedbackLevel.Hint);
             
@@ -82,14 +82,14 @@ namespace TestPDL
 
             var a = solver.MkCharConstraint(false, 'a');
             var b = solver.MkCharConstraint(false, 'b');
-            var moves = new List<Move<BvSet>>();
+            var moves = new List<Move<BDD>>();
 
-            moves.Add(new Move<BvSet>(0, 0, a));
-            moves.Add(new Move<BvSet>(0, 5, a));
-            moves.Add(new Move<BvSet>(5, 0, a));
-            moves.Add(new Move<BvSet>(5, 5, b));
+            moves.Add(new Move<BDD>(0, 0, a));
+            moves.Add(new Move<BDD>(0, 5, a));
+            moves.Add(new Move<BDD>(5, 0, a));
+            moves.Add(new Move<BDD>(5, 5, b));
 
-            var dfa2 = Automaton<BvSet>.Create(0, new int[] { 5 }, moves);
+            var dfa2 = Automaton<BDD>.Create(0, new int[] { 5 }, moves);
             var feedbackGrade = DFAGrading.GetGrade(dfa1, dfa2, al, solver, timeout, 10, FeedbackLevel.Solution, true, false, false);
             var feedString = "<ul>";
             foreach (var feed in feedbackGrade.Second)
@@ -107,7 +107,7 @@ namespace TestPDL
             string rexpr1 = "(a|b)*";
 
             var escapedRexpr = string.Format("^({0})$", rexpr1);
-            Automaton<BvSet> aut1 = null;
+            Automaton<BDD> aut1 = null;
             try
             {
                 aut1 = solver.Convert(escapedRexpr);
@@ -128,7 +128,7 @@ namespace TestPDL
             string rexpr2 = "(a|b)+";
 
             escapedRexpr = string.Format("^({0})$", rexpr2);
-            Automaton<BvSet> aut2 = null;
+            Automaton<BDD> aut2 = null;
             try
             {
                 aut2 = solver.Convert(escapedRexpr);
@@ -169,24 +169,24 @@ namespace TestPDL
 
             var a = solver.MkCharConstraint(false, 'a');
             var b = solver.MkCharConstraint(false, 'b');
-            var moves = new List<Move<BvSet>>();
+            var moves = new List<Move<BDD>>();
 
-            moves.Add(new Move<BvSet>(0, 0, a));
-            moves.Add(new Move<BvSet>(0, 1, b));
-            moves.Add(new Move<BvSet>(1, 2, a));
-            moves.Add(new Move<BvSet>(1, 0, b));
-            moves.Add(new Move<BvSet>(2, 2, a));
-            moves.Add(new Move<BvSet>(2, 3, b));
-            moves.Add(new Move<BvSet>(3, 4, a));
-            moves.Add(new Move<BvSet>(3, 2, b));
-            moves.Add(new Move<BvSet>(4, 4, a));
-            moves.Add(new Move<BvSet>(4, 5, b));
-            moves.Add(new Move<BvSet>(5, 6, a));
-            moves.Add(new Move<BvSet>(5, 4, b));
-            moves.Add(new Move<BvSet>(6, 6, a));
-            moves.Add(new Move<BvSet>(6, 6, b)); 
+            moves.Add(new Move<BDD>(0, 0, a));
+            moves.Add(new Move<BDD>(0, 1, b));
+            moves.Add(new Move<BDD>(1, 2, a));
+            moves.Add(new Move<BDD>(1, 0, b));
+            moves.Add(new Move<BDD>(2, 2, a));
+            moves.Add(new Move<BDD>(2, 3, b));
+            moves.Add(new Move<BDD>(3, 4, a));
+            moves.Add(new Move<BDD>(3, 2, b));
+            moves.Add(new Move<BDD>(4, 4, a));
+            moves.Add(new Move<BDD>(4, 5, b));
+            moves.Add(new Move<BDD>(5, 6, a));
+            moves.Add(new Move<BDD>(5, 4, b));
+            moves.Add(new Move<BDD>(6, 6, a));
+            moves.Add(new Move<BDD>(6, 6, b)); 
 
-            var dfa2 = Automaton<BvSet>.Create(0, new int[] { 4,5 }, moves);
+            var dfa2 = Automaton<BDD>.Create(0, new int[] { 4,5 }, moves);
 
             solver.SaveAsDot(dfaCorr, "aa", "trytrycorr");
             solver.SaveAsDot(dfa2, "aa", "trytry");
@@ -260,26 +260,26 @@ namespace TestPDL
 
             var a = solver.MkCharConstraint(false, 'a');
             var b = solver.MkCharConstraint(false, 'b');
-            var moves = new List<Move<BvSet>>();
+            var moves = new List<Move<BDD>>();
 
-            moves.Add(new Move<BvSet>(0, 1, a));
-            moves.Add(new Move<BvSet>(0, 1, b));
-            moves.Add(new Move<BvSet>(1, 2, a));
-            moves.Add(new Move<BvSet>(1, 2, b));
-            moves.Add(new Move<BvSet>(2, 3, a));
-            moves.Add(new Move<BvSet>(2, 3, b));
-            moves.Add(new Move<BvSet>(3,3, a));
-            moves.Add(new Move<BvSet>(3, 3, b));
-            //moves.Add(new Move<BvSet>(3, 4, a));
-            //moves.Add(new Move<BvSet>(3, 2, b));
-            //moves.Add(new Move<BvSet>(4, 4, a));
-            //moves.Add(new Move<BvSet>(4, 5, b));
-            //moves.Add(new Move<BvSet>(5, 6, a));
-            //moves.Add(new Move<BvSet>(5, 4, b));
-            //moves.Add(new Move<BvSet>(6, 6, a));
-            //moves.Add(new Move<BvSet>(6, 6, b));
+            moves.Add(new Move<BDD>(0, 1, a));
+            moves.Add(new Move<BDD>(0, 1, b));
+            moves.Add(new Move<BDD>(1, 2, a));
+            moves.Add(new Move<BDD>(1, 2, b));
+            moves.Add(new Move<BDD>(2, 3, a));
+            moves.Add(new Move<BDD>(2, 3, b));
+            moves.Add(new Move<BDD>(3,3, a));
+            moves.Add(new Move<BDD>(3, 3, b));
+            //moves.Add(new Move<BDD>(3, 4, a));
+            //moves.Add(new Move<BDD>(3, 2, b));
+            //moves.Add(new Move<BDD>(4, 4, a));
+            //moves.Add(new Move<BDD>(4, 5, b));
+            //moves.Add(new Move<BDD>(5, 6, a));
+            //moves.Add(new Move<BDD>(5, 4, b));
+            //moves.Add(new Move<BDD>(6, 6, a));
+            //moves.Add(new Move<BDD>(6, 6, b));
 
-            var dfa2 = Automaton<BvSet>.Create(0, new int[] { 3 }, moves);            
+            var dfa2 = Automaton<BDD>.Create(0, new int[] { 3 }, moves);            
             //Assert.IsTrue(phi2.GetDFA(al,solver).IsEquivalentWith(dfa2,solver));
 
             solver.SaveAsDot(dfaCorr, "aa", "corr");
@@ -311,39 +311,39 @@ namespace TestPDL
 
 
 
-            var movesSolution = new List<Move<BvSet>>();
+            var movesSolution = new List<Move<BDD>>();
 
-            movesSolution.Add(new Move<BvSet>(0, 1, a));
-            movesSolution.Add(new Move<BvSet>(0, 2, b));
-            movesSolution.Add(new Move<BvSet>(1, 0, a));
-            movesSolution.Add(new Move<BvSet>(1, 3, b));
-            movesSolution.Add(new Move<BvSet>(2, 3, a));
-            movesSolution.Add(new Move<BvSet>(2, 5, b));
-            movesSolution.Add(new Move<BvSet>(3, 2, a));
-            movesSolution.Add(new Move<BvSet>(3, 4, b));
-            movesSolution.Add(new Move<BvSet>(4, 5, a));
-            movesSolution.Add(new Move<BvSet>(4, 1, b));
-            movesSolution.Add(new Move<BvSet>(5, 4, a));
-            movesSolution.Add(new Move<BvSet>(5, 1, b));
+            movesSolution.Add(new Move<BDD>(0, 1, a));
+            movesSolution.Add(new Move<BDD>(0, 2, b));
+            movesSolution.Add(new Move<BDD>(1, 0, a));
+            movesSolution.Add(new Move<BDD>(1, 3, b));
+            movesSolution.Add(new Move<BDD>(2, 3, a));
+            movesSolution.Add(new Move<BDD>(2, 5, b));
+            movesSolution.Add(new Move<BDD>(3, 2, a));
+            movesSolution.Add(new Move<BDD>(3, 4, b));
+            movesSolution.Add(new Move<BDD>(4, 5, a));
+            movesSolution.Add(new Move<BDD>(4, 1, b));
+            movesSolution.Add(new Move<BDD>(5, 4, a));
+            movesSolution.Add(new Move<BDD>(5, 1, b));
 
 
-            var dfaSolution = Automaton<BvSet>.Create(0, new int[] { 2 }, movesSolution);
+            var dfaSolution = Automaton<BDD>.Create(0, new int[] { 2 }, movesSolution);
 
-            var movesAttempt = new List<Move<BvSet>>();
+            var movesAttempt = new List<Move<BDD>>();
 
-            movesAttempt.Add(new Move<BvSet>(0, 1, b));
-            movesAttempt.Add(new Move<BvSet>(0, 2, a));
-            movesAttempt.Add(new Move<BvSet>(1, 0, b));
-            movesAttempt.Add(new Move<BvSet>(1, 3, a));
-            movesAttempt.Add(new Move<BvSet>(2, 3, b));
-            movesAttempt.Add(new Move<BvSet>(2, 5, a));
-            movesAttempt.Add(new Move<BvSet>(3, 2, b));
-            movesAttempt.Add(new Move<BvSet>(3, 4, a));
-            movesAttempt.Add(new Move<BvSet>(4, 5, b));
-            movesAttempt.Add(new Move<BvSet>(4, 1, a));
-            movesAttempt.Add(new Move<BvSet>(5, 4, b));
-            movesAttempt.Add(new Move<BvSet>(5, 1, a));
-            var dfaAttempt = Automaton<BvSet>.Create(0, new int[] { 2 }, movesAttempt);
+            movesAttempt.Add(new Move<BDD>(0, 1, b));
+            movesAttempt.Add(new Move<BDD>(0, 2, a));
+            movesAttempt.Add(new Move<BDD>(1, 0, b));
+            movesAttempt.Add(new Move<BDD>(1, 3, a));
+            movesAttempt.Add(new Move<BDD>(2, 3, b));
+            movesAttempt.Add(new Move<BDD>(2, 5, a));
+            movesAttempt.Add(new Move<BDD>(3, 2, b));
+            movesAttempt.Add(new Move<BDD>(3, 4, a));
+            movesAttempt.Add(new Move<BDD>(4, 5, b));
+            movesAttempt.Add(new Move<BDD>(4, 1, a));
+            movesAttempt.Add(new Move<BDD>(5, 4, b));
+            movesAttempt.Add(new Move<BDD>(5, 1, a));
+            var dfaAttempt = Automaton<BDD>.Create(0, new int[] { 2 }, movesAttempt);
 
             var gr = DFAGrading.GetGrade(dfaSolution, dfaAttempt, al, solver, 1500, 10, FeedbackLevel.Hint, true, true, true);
             Console.WriteLine(gr.First);
@@ -371,32 +371,32 @@ namespace TestPDL
 
 
 
-            var movesSolution = new List<Move<BvSet>>();
+            var movesSolution = new List<Move<BDD>>();
 
-            movesSolution.Add(new Move<BvSet>(0, 0, a));
-            movesSolution.Add(new Move<BvSet>(0, 1, b));
-            movesSolution.Add(new Move<BvSet>(1, 2, a));
-            movesSolution.Add(new Move<BvSet>(1, 1, b));
-            movesSolution.Add(new Move<BvSet>(2, 2, a));
-            movesSolution.Add(new Move<BvSet>(2, 3, b));
-            movesSolution.Add(new Move<BvSet>(3, 0, a));
-            movesSolution.Add(new Move<BvSet>(3, 3, b));
+            movesSolution.Add(new Move<BDD>(0, 0, a));
+            movesSolution.Add(new Move<BDD>(0, 1, b));
+            movesSolution.Add(new Move<BDD>(1, 2, a));
+            movesSolution.Add(new Move<BDD>(1, 1, b));
+            movesSolution.Add(new Move<BDD>(2, 2, a));
+            movesSolution.Add(new Move<BDD>(2, 3, b));
+            movesSolution.Add(new Move<BDD>(3, 0, a));
+            movesSolution.Add(new Move<BDD>(3, 3, b));
 
 
-            var dfaSolution = Automaton<BvSet>.Create(0, new int[] {0,1 }, movesSolution);
+            var dfaSolution = Automaton<BDD>.Create(0, new int[] {0,1 }, movesSolution);
 
-            var movesAttempt = new List<Move<BvSet>>();
+            var movesAttempt = new List<Move<BDD>>();
 
-            movesAttempt.Add(new Move<BvSet>(0, 0, a));
-            movesAttempt.Add(new Move<BvSet>(0, 1, b));
-            movesAttempt.Add(new Move<BvSet>(0, 1, null));
-            movesAttempt.Add(new Move<BvSet>(1, 2, a));
-            movesAttempt.Add(new Move<BvSet>(1, 1, b));
-            movesAttempt.Add(new Move<BvSet>(2, 2, a));
-            movesAttempt.Add(new Move<BvSet>(2, 3, b));
-            movesAttempt.Add(new Move<BvSet>(3, 0, a));
-            movesAttempt.Add(new Move<BvSet>(3, 3, b));
-            var dfaAttempt = Automaton<BvSet>.Create(0, new int[] { 0,1 }, movesAttempt);
+            movesAttempt.Add(new Move<BDD>(0, 0, a));
+            movesAttempt.Add(new Move<BDD>(0, 1, b));
+            movesAttempt.Add(new Move<BDD>(0, 1, null));
+            movesAttempt.Add(new Move<BDD>(1, 2, a));
+            movesAttempt.Add(new Move<BDD>(1, 1, b));
+            movesAttempt.Add(new Move<BDD>(2, 2, a));
+            movesAttempt.Add(new Move<BDD>(2, 3, b));
+            movesAttempt.Add(new Move<BDD>(3, 0, a));
+            movesAttempt.Add(new Move<BDD>(3, 3, b));
+            var dfaAttempt = Automaton<BDD>.Create(0, new int[] { 0,1 }, movesAttempt);
 
             var gr = NFAGrading.GetGrade(dfaSolution, dfaAttempt, al, solver, 4000, 10, FeedbackLevel.Hint);
             Console.WriteLine(gr.First);
@@ -420,26 +420,26 @@ namespace TestPDL
             var a = solver.MkCharConstraint(false, 'a');
             var b = solver.MkCharConstraint(false, 'b');
 
-            var movesSolution = new List<Move<BvSet>>();
+            var movesSolution = new List<Move<BDD>>();
 
-            movesSolution.Add(new Move<BvSet>(0, 1, a));
-            movesSolution.Add(new Move<BvSet>(1, 2, a));
-            movesSolution.Add(new Move<BvSet>(0, 3, a));
-            movesSolution.Add(new Move<BvSet>(0, 3, b));
-            movesSolution.Add(new Move<BvSet>(3, 0, a));
-            movesSolution.Add(new Move<BvSet>(3, 0, b));
+            movesSolution.Add(new Move<BDD>(0, 1, a));
+            movesSolution.Add(new Move<BDD>(1, 2, a));
+            movesSolution.Add(new Move<BDD>(0, 3, a));
+            movesSolution.Add(new Move<BDD>(0, 3, b));
+            movesSolution.Add(new Move<BDD>(3, 0, a));
+            movesSolution.Add(new Move<BDD>(3, 0, b));
 
 
-            var dfaSolution = Automaton<BvSet>.Create(0, new int[] { 2 }, movesSolution);
+            var dfaSolution = Automaton<BDD>.Create(0, new int[] { 2 }, movesSolution);
 
-            var movesAttempt = new List<Move<BvSet>>();
+            var movesAttempt = new List<Move<BDD>>();
 
-            movesAttempt.Add(new Move<BvSet>(0, 0, a));
-            movesAttempt.Add(new Move<BvSet>(0, 0, b));
-            movesAttempt.Add(new Move<BvSet>(0, 1, a));
-            movesAttempt.Add(new Move<BvSet>(1, 2, a));
-            movesAttempt.Add(new Move<BvSet>(2, 3, a));
-            var dfaAttempt = Automaton<BvSet>.Create(0, new int[] { 3 }, movesAttempt);
+            movesAttempt.Add(new Move<BDD>(0, 0, a));
+            movesAttempt.Add(new Move<BDD>(0, 0, b));
+            movesAttempt.Add(new Move<BDD>(0, 1, a));
+            movesAttempt.Add(new Move<BDD>(1, 2, a));
+            movesAttempt.Add(new Move<BDD>(2, 3, a));
+            var dfaAttempt = Automaton<BDD>.Create(0, new int[] { 3 }, movesAttempt);
 
             var gr = NFAGrading.GetGrade(dfaSolution, dfaAttempt, al, solver, 1500, 10, FeedbackLevel.Hint);
             Console.WriteLine(gr.First);
@@ -462,29 +462,29 @@ namespace TestPDL
 
             var a = solver.MkCharConstraint(false, 'a');
             var b = solver.MkCharConstraint(false, 'b');
-            var movesSol = new List<Move<BvSet>>();
+            var movesSol = new List<Move<BDD>>();
 
-            movesSol.Add(new Move<BvSet>(0, 0, a));
-            movesSol.Add(new Move<BvSet>(0, 0, b));
-            movesSol.Add(new Move<BvSet>(0, 1, a));
-            movesSol.Add(new Move<BvSet>(1, 2, b));
+            movesSol.Add(new Move<BDD>(0, 0, a));
+            movesSol.Add(new Move<BDD>(0, 0, b));
+            movesSol.Add(new Move<BDD>(0, 1, a));
+            movesSol.Add(new Move<BDD>(1, 2, b));
 
-            var nfa1 = Automaton<BvSet>.Create(0, new int[] { 2 }, movesSol);
+            var nfa1 = Automaton<BDD>.Create(0, new int[] { 2 }, movesSol);
 
-            var movesAtt = new List<Move<BvSet>>();
+            var movesAtt = new List<Move<BDD>>();
 
-            movesAtt.Add(new Move<BvSet>(0, 0, a));
-            movesAtt.Add(new Move<BvSet>(0, 1, b));
-            movesAtt.Add(new Move<BvSet>(1, 1, b));
-            movesAtt.Add(new Move<BvSet>(1, 2, a));
-            movesAtt.Add(new Move<BvSet>(2, 2, a));
-            movesAtt.Add(new Move<BvSet>(2, 3, b));
-            movesAtt.Add(new Move<BvSet>(3, 3, b));
-            movesAtt.Add(new Move<BvSet>(3, 4, a));
-            movesAtt.Add(new Move<BvSet>(4, 4, a));
-            movesAtt.Add(new Move<BvSet>(4, 4, b));
+            movesAtt.Add(new Move<BDD>(0, 0, a));
+            movesAtt.Add(new Move<BDD>(0, 1, b));
+            movesAtt.Add(new Move<BDD>(1, 1, b));
+            movesAtt.Add(new Move<BDD>(1, 2, a));
+            movesAtt.Add(new Move<BDD>(2, 2, a));
+            movesAtt.Add(new Move<BDD>(2, 3, b));
+            movesAtt.Add(new Move<BDD>(3, 3, b));
+            movesAtt.Add(new Move<BDD>(3, 4, a));
+            movesAtt.Add(new Move<BDD>(4, 4, a));
+            movesAtt.Add(new Move<BDD>(4, 4, b));
 
-            var nfa2 = Automaton<BvSet>.Create(0, new int[] { 4 }, movesAtt);
+            var nfa2 = Automaton<BDD>.Create(0, new int[] { 4 }, movesAtt);
 
             List<Pair<int, IEnumerable<NFAFeedback>>> tests = new List<Pair<int, IEnumerable<NFAFeedback>>>();
             tests.Insert(0, NFAGrading.GetGrade(nfa1, nfa2, al, solver, timeout, 10, FeedbackLevel.Hint));
@@ -509,30 +509,30 @@ namespace TestPDL
 
             var a = solver.MkCharConstraint(false, 'a');
             var b = solver.MkCharConstraint(false, 'b');
-            var movesSol = new List<Move<BvSet>>();
+            var movesSol = new List<Move<BDD>>();
 
-            movesSol.Add(new Move<BvSet>(5, 0, null));
-            movesSol.Add(new Move<BvSet>(0, 0, a));
-            movesSol.Add(new Move<BvSet>(0, 0, b));
-            movesSol.Add(new Move<BvSet>(0, 1, a));
-            movesSol.Add(new Move<BvSet>(1, 2, b));
+            movesSol.Add(new Move<BDD>(5, 0, null));
+            movesSol.Add(new Move<BDD>(0, 0, a));
+            movesSol.Add(new Move<BDD>(0, 0, b));
+            movesSol.Add(new Move<BDD>(0, 1, a));
+            movesSol.Add(new Move<BDD>(1, 2, b));
 
-            var nfa1 = Automaton<BvSet>.Create(5, new int[] { 2 }, movesSol);
+            var nfa1 = Automaton<BDD>.Create(5, new int[] { 2 }, movesSol);
 
-            var movesAtt = new List<Move<BvSet>>();
+            var movesAtt = new List<Move<BDD>>();
 
-            movesAtt.Add(new Move<BvSet>(0, 0, a));
-            movesAtt.Add(new Move<BvSet>(0, 1, b));
-            movesAtt.Add(new Move<BvSet>(1, 1, b));
-            movesAtt.Add(new Move<BvSet>(1, 2, a));
-            movesAtt.Add(new Move<BvSet>(2, 2, a));
-            movesAtt.Add(new Move<BvSet>(2, 3, b));
-            movesAtt.Add(new Move<BvSet>(3, 3, b));
-            movesAtt.Add(new Move<BvSet>(3, 4, a));
-            movesAtt.Add(new Move<BvSet>(4, 4, a));
-            movesAtt.Add(new Move<BvSet>(4, 4, b));
+            movesAtt.Add(new Move<BDD>(0, 0, a));
+            movesAtt.Add(new Move<BDD>(0, 1, b));
+            movesAtt.Add(new Move<BDD>(1, 1, b));
+            movesAtt.Add(new Move<BDD>(1, 2, a));
+            movesAtt.Add(new Move<BDD>(2, 2, a));
+            movesAtt.Add(new Move<BDD>(2, 3, b));
+            movesAtt.Add(new Move<BDD>(3, 3, b));
+            movesAtt.Add(new Move<BDD>(3, 4, a));
+            movesAtt.Add(new Move<BDD>(4, 4, a));
+            movesAtt.Add(new Move<BDD>(4, 4, b));
 
-            var nfa2 = Automaton<BvSet>.Create(0, new int[] { 4 }, movesAtt);
+            var nfa2 = Automaton<BDD>.Create(0, new int[] { 4 }, movesAtt);
 
             List<Pair<int, IEnumerable<NFAFeedback>>> tests = new List<Pair<int, IEnumerable<NFAFeedback>>>();
             tests.Insert(0,NFAGrading.GetGrade(nfa1, nfa2, al, solver, timeout, 10, FeedbackLevel.Hint));
@@ -560,26 +560,26 @@ namespace TestPDL
             var l = solver.MkCharConstraint(false, 'L');
             var e = solver.MkCharConstraint(false, 'E');
 
-            var movesSolution = new List<Move<BvSet>>();
+            var movesSolution = new List<Move<BDD>>();
 
-            movesSolution.Add(new Move<BvSet>(0, 1, g));
-            movesSolution.Add(new Move<BvSet>(1, 1, o));
-            movesSolution.Add(new Move<BvSet>(1, 2, g));
-            movesSolution.Add(new Move<BvSet>(2, 3, l));
-            movesSolution.Add(new Move<BvSet>(3, 4, e));            
+            movesSolution.Add(new Move<BDD>(0, 1, g));
+            movesSolution.Add(new Move<BDD>(1, 1, o));
+            movesSolution.Add(new Move<BDD>(1, 2, g));
+            movesSolution.Add(new Move<BDD>(2, 3, l));
+            movesSolution.Add(new Move<BDD>(3, 4, e));            
 
 
-            var dfaSolution = Automaton<BvSet>.Create(0, new int[] { 4 }, movesSolution);
+            var dfaSolution = Automaton<BDD>.Create(0, new int[] { 4 }, movesSolution);
 
-            var movesAttempt = new List<Move<BvSet>>();
+            var movesAttempt = new List<Move<BDD>>();
 
-            movesAttempt.Add(new Move<BvSet>(0, 1, g));
-            movesAttempt.Add(new Move<BvSet>(1, 2, null));
-            movesAttempt.Add(new Move<BvSet>(2, 2, o));
-            movesAttempt.Add(new Move<BvSet>(2, 3, g));
-            movesAttempt.Add(new Move<BvSet>(3, 4, l));
-            movesAttempt.Add(new Move<BvSet>(4, 5, e));
-            var dfaAttempt = Automaton<BvSet>.Create(0, new int[] { 5 }, movesAttempt);
+            movesAttempt.Add(new Move<BDD>(0, 1, g));
+            movesAttempt.Add(new Move<BDD>(1, 2, null));
+            movesAttempt.Add(new Move<BDD>(2, 2, o));
+            movesAttempt.Add(new Move<BDD>(2, 3, g));
+            movesAttempt.Add(new Move<BDD>(3, 4, l));
+            movesAttempt.Add(new Move<BDD>(4, 5, e));
+            var dfaAttempt = Automaton<BDD>.Create(0, new int[] { 5 }, movesAttempt);
 
             var gr = NFAGrading.GetGrade(dfaSolution, dfaAttempt, al, solver, 1500, 10, FeedbackLevel.Hint);
             Console.WriteLine(gr.First);
@@ -603,29 +603,29 @@ namespace TestPDL
             var o = solver.MkCharConstraint(false, '1');
             var z = solver.MkCharConstraint(false, '0');            
 
-            var movesSolution = new List<Move<BvSet>>();
+            var movesSolution = new List<Move<BDD>>();
 
-            movesSolution.Add(new Move<BvSet>(0, 1, null));
-            movesSolution.Add(new Move<BvSet>(0, 2, null));
-            movesSolution.Add(new Move<BvSet>(1, 1, z));
-            movesSolution.Add(new Move<BvSet>(1, 1, o));
-            movesSolution.Add(new Move<BvSet>(1, 3, z));
-            movesSolution.Add(new Move<BvSet>(2, 2, o));
+            movesSolution.Add(new Move<BDD>(0, 1, null));
+            movesSolution.Add(new Move<BDD>(0, 2, null));
+            movesSolution.Add(new Move<BDD>(1, 1, z));
+            movesSolution.Add(new Move<BDD>(1, 1, o));
+            movesSolution.Add(new Move<BDD>(1, 3, z));
+            movesSolution.Add(new Move<BDD>(2, 2, o));
 
 
-            var dfaSolution = Automaton<BvSet>.Create(0, new int[] { 2, 3 }, movesSolution);
+            var dfaSolution = Automaton<BDD>.Create(0, new int[] { 2, 3 }, movesSolution);
 
-            var movesAttempt = new List<Move<BvSet>>();
+            var movesAttempt = new List<Move<BDD>>();
 
-            movesAttempt.Add(new Move<BvSet>(0, 1, null));
-            movesAttempt.Add(new Move<BvSet>(0, 3, null));
-            movesAttempt.Add(new Move<BvSet>(1, 2, z));
-            movesAttempt.Add(new Move<BvSet>(2, 1, o));
-            movesAttempt.Add(new Move<BvSet>(2, 2, z));
-            movesAttempt.Add(new Move<BvSet>(1, 1, o));
-            movesAttempt.Add(new Move<BvSet>(3, 4, o));
-            movesAttempt.Add(new Move<BvSet>(4, 4, o));
-            var dfaAttempt = Automaton<BvSet>.Create(0, new int[] { 4,2 }, movesAttempt);
+            movesAttempt.Add(new Move<BDD>(0, 1, null));
+            movesAttempt.Add(new Move<BDD>(0, 3, null));
+            movesAttempt.Add(new Move<BDD>(1, 2, z));
+            movesAttempt.Add(new Move<BDD>(2, 1, o));
+            movesAttempt.Add(new Move<BDD>(2, 2, z));
+            movesAttempt.Add(new Move<BDD>(1, 1, o));
+            movesAttempt.Add(new Move<BDD>(3, 4, o));
+            movesAttempt.Add(new Move<BDD>(4, 4, o));
+            var dfaAttempt = Automaton<BDD>.Create(0, new int[] { 4,2 }, movesAttempt);
 
             var gr = NFAGrading.GetGrade(dfaSolution, dfaAttempt, al, solver, 1500, 10, FeedbackLevel.Hint);
             Console.WriteLine(gr.First);

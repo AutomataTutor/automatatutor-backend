@@ -5,12 +5,6 @@ using System.Text;
 using System.Diagnostics;
 
 using Microsoft.Automata;
-using Microsoft.Z3;
-
-using MSOZ3;
-using Antlr.Runtime;
-using Antlr.Runtime.Tree;
-using AutomataPDL.Parse;
 
 //the abstract classes refer to the different types in PDL
 
@@ -275,14 +269,14 @@ namespace AutomataPDL
             return "AAA:0-" + this.GetNodeName() + ":0;" + sb.ToString();
         }
 
-        public static PDLPred ParseString(string s)
-        {
-            ANTLRStringStream Input = new ANTLRStringStream(s);
-            PDLGrammarLexer Lexer = new PDLGrammarLexer(Input);
-            CommonTokenStream Tokens = new CommonTokenStream(Lexer);
-            PDLGrammarParser Parser = new PDLGrammarParser(Tokens);
-            return Parser.parse();            
-        }
+        //public static PDLPred ParseString(string s)
+        //{
+        //    ANTLRStringStream Input = new ANTLRStringStream(s);
+        //    PDLGrammarLexer Lexer = new PDLGrammarLexer(Input);
+        //    CommonTokenStream Tokens = new CommonTokenStream(Lexer);
+        //    PDLGrammarParser Parser = new PDLGrammarParser(Tokens);
+        //    return Parser.parse();            
+        //}
     }
     
 }

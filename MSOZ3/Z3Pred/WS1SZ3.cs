@@ -38,7 +38,7 @@ namespace MSOZ3
             var newMoves = Automaton<Expr>.Empty.GetMoves().ToList();
             foreach (var oldMove in dfapair.GetMoves())
             {
-                var oldCond = oldMove.Condition;                             
+                var oldCond = oldMove.Label;                             
 
                 //Compute the new condition as ()
                 Expr newCond = oldCond;
@@ -98,7 +98,7 @@ namespace MSOZ3
             var newMoves = Automaton<Expr>.Empty.GetMoves().ToList();
             foreach (var oldMove in phiDfa.GetMoves())
             {
-                var oldCond = oldMove.Condition;                               
+                var oldCond = oldMove.Label;                               
 
                 var t = z3p.MkProj(1,var);
                 //Compute the new conditions

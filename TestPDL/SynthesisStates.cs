@@ -320,7 +320,7 @@ namespace TestPDL
             {
                 foreach (var state in dfa.States)
                 {
-                    var dfaSt = Automaton<BvSet>.Create(dfa.InitialState, new int[] { state }, dfa.GetMoves());
+                    var dfaSt = Automaton<BDD>.Create(dfa.InitialState, new int[] { state }, dfa.GetMoves());
                     dfaSt = dfaSt.Determinize(solver).Minimize(solver);
                     sw.Reset();
                     sw.Start();

@@ -114,21 +114,21 @@ namespace AutomataPDL
     /// </summary>
     class NFACounterexampleFeedback : NFAFeedback
     {
-        Automaton<BvSet> positiveDifference;
-        Automaton<BvSet> negativeDifference;
+        Automaton<BDD> positiveDifference;
+        Automaton<BDD> negativeDifference;
 
         // automata come already determinized
         public NFACounterexampleFeedback(
             FeedbackLevel level, HashSet<char> alphabet, 
-            Automaton<BvSet> solutionDFA, Automaton<BvSet> attemptDFA, 
+            Automaton<BDD> solutionDFA, Automaton<BDD> attemptDFA, 
             CharSetSolver solver)
             : base(level, alphabet, solver)
         {
-            BvSet pred = solver.False;
+            BDD pred = solver.False;
             foreach (var el in alphabet)
                 pred = solver.MkOr(pred, solver.MkCharConstraint(false, el));
 
-            var dfaAll = Automaton<BvSet>.Create(0, new int[] { 0 }, new Move<BvSet>[] { new Move<BvSet>(0, 0, pred) });
+            var dfaAll = Automaton<BDD>.Create(0, new int[] { 0 }, new Move<BDD>[] { new Move<BDD>(0, 0, pred) });
             this.positiveDifference = solutionDFA.Minus(attemptDFA, solver).Determinize(solver).Minimize(solver);
             this.negativeDifference = attemptDFA.Minus(solutionDFA, solver).Determinize(solver).Minimize(solver);
             this.solver = solver;
@@ -163,7 +163,7 @@ namespace AutomataPDL
         string counterexample;
         NFAEditScript script;
 
-        public NFAEDFeedback(Automaton<BvSet> nfaGoal, Automaton<BvSet> nfaAttempt, 
+        public NFAEDFeedback(Automaton<BDD> nfaGoal, Automaton<BDD> nfaAttempt, 
             FeedbackLevel level, HashSet<char> alphabet, 
             NFAEditScript script, CharSetSolver solver)
             : base(level, alphabet, solver)

@@ -29,7 +29,7 @@ namespace AutomataPDL
             string rexpr = "a|b";
 
             var escapedRexpr = string.Format("^{0}$", rexpr);
-            Automaton<BvSet> aut = null;
+            Automaton<BDD> aut = null;
             try
             {
                 aut = solver.Convert(escapedRexpr);
@@ -43,7 +43,7 @@ namespace AutomataPDL
             if (!diff.IsEmpty)
                 throw new PDLException("The regular expression should only accept strings over (a|b)*.");
 
-            var auttt =  new Pair<HashSet<char>, Automaton<BvSet>>(al, aut);
+            var auttt =  new Pair<HashSet<char>, Automaton<BDD>>(al, aut);
         }
        
     }

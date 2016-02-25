@@ -32,7 +32,7 @@ namespace TestPDL
         //    string path = @"../../../TestPDL/DFAs/";
         //    var solver = new CharSetSolver(BitWidth.BV64);
         //    System.IO.StreamReader file;
-        //    Dictionary<string, Pair<HashSet<char>, Automaton<BvSet>>> dfas = new Dictionary<string,Pair<HashSet<char>, Automaton<BvSet>>>();
+        //    Dictionary<string, Pair<HashSet<char>, Automaton<BDD>>> dfas = new Dictionary<string,Pair<HashSet<char>, Automaton<BDD>>>();
         //    PDLPred synthPhi;
         //    StringBuilder sb = new StringBuilder();
 
@@ -95,7 +95,7 @@ namespace TestPDL
         //    string path = @"../../../TestPDL/DFAs/";
         //    var solver = new CharSetSolver(BitWidth.BV64);
         //    System.IO.StreamReader file;
-        //    Dictionary<string, Pair<HashSet<char>, Automaton<BvSet>>> dfas = new Dictionary<string, Pair<HashSet<char>, Automaton<BvSet>>>();
+        //    Dictionary<string, Pair<HashSet<char>, Automaton<BDD>>> dfas = new Dictionary<string, Pair<HashSet<char>, Automaton<BDD>>>();
         //    PDLPred synthPhi;
         //    StringBuilder sb = new StringBuilder();
 
@@ -127,7 +127,7 @@ namespace TestPDL
 
         //            sb.AppendLine(string.Format("|+++++++ State {0} +++++++ {1}", state, (((dfa.GetFinalStates()).Contains(state)) ? ("FINAL") : (""))));
         //            sb.AppendLine("|");
-        //            var dfaSt = Automaton<BvSet>.Create(dfa.InitialState, new int[] { state }, dfa.GetMoves());
+        //            var dfaSt = Automaton<BDD>.Create(dfa.InitialState, new int[] { state }, dfa.GetMoves());
         //            dfaSt = dfaSt.Determinize(solver).Minimize(solver);
 
         //            synthPhi = null;
@@ -180,7 +180,7 @@ namespace TestPDL
         //    string path = @"../../../TestPDL/DFAs/";
         //    var solver = new CharSetSolver(BitWidth.BV64);
         //    System.IO.StreamReader file;
-        //    Dictionary<string, Pair<HashSet<char>, Automaton<BvSet>>> dfas = new Dictionary<string, Pair<HashSet<char>, Automaton<BvSet>>>();
+        //    Dictionary<string, Pair<HashSet<char>, Automaton<BDD>>> dfas = new Dictionary<string, Pair<HashSet<char>, Automaton<BDD>>>();
         //    Regexp regexp;
         //    StringBuilder sb = new StringBuilder();
 

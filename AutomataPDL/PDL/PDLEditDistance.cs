@@ -22,7 +22,7 @@ namespace AutomataPDL
         /// <param name="solver"></param>
         /// <param name="timeout"></param>
         /// <returns></returns>
-        public static double GetMinimalFormulaEditDistanceRatio(Automaton<BvSet> dfa1, Automaton<BvSet> dfa2, HashSet<char> al, CharSetSolver solver, long timeout, PDLEnumerator pdlEnumerator)
+        public static double GetMinimalFormulaEditDistanceRatio(Automaton<BDD> dfa1, Automaton<BDD> dfa2, HashSet<char> al, CharSetSolver solver, long timeout, PDLEnumerator pdlEnumerator)
         {
             var v = GetMinimalFormulaEditDistanceTransformation(dfa1, dfa2, al, solver, timeout, pdlEnumerator);
             if(v!=null){
@@ -42,7 +42,7 @@ namespace AutomataPDL
         /// <param name="solver"></param>
         /// <param name="timeout"></param>
         /// <returns>transformation of smallest cost, transf of feeedback (first one)</returns>
-        public static Pair<Transformation, Transformation> GetMinimalFormulaEditDistanceTransformation(Automaton<BvSet> dfa1, Automaton<BvSet> dfa2, HashSet<char> al, CharSetSolver solver, long timeout, PDLEnumerator pdlEnumerator)
+        public static Pair<Transformation, Transformation> GetMinimalFormulaEditDistanceTransformation(Automaton<BDD> dfa1, Automaton<BDD> dfa2, HashSet<char> al, CharSetSolver solver, long timeout, PDLEnumerator pdlEnumerator)
         {
             int maxFormulas = 30;
             //Find all the formulas describing dfa1 and dfa2

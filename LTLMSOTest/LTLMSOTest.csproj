@@ -78,10 +78,6 @@
       <Project>{C9EF5066-6D6E-46F7-8D88-9C50F933042E}</Project>
       <Name>AutomataPDL</Name>
     </ProjectReference>
-    <ProjectReference Include="..\LTLMSO\LTLMSO.csproj">
-      <Project>{86B525DF-F20D-490D-B6C5-3B7962F22EA2}</Project>
-      <Name>LTLMSO</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MSOZ3\MSOZ3.csproj">
       <Project>{8745F590-2663-4968-BFEA-500DDCE6C9E3}</Project>
       <Name>MSOZ3</Name>

@@ -86,7 +86,7 @@ namespace AutomataPDL
         string counterexample;
         DFAEditScript script;
 
-        public DFAEDFeedback(Automaton<BvSet> dfaGoal, Automaton<BvSet> dfaAttempt, FeedbackLevel level, HashSet<char> alphabet, DFAEditScript script, double utility, CharSetSolver solver)
+        public DFAEDFeedback(Automaton<BDD> dfaGoal, Automaton<BDD> dfaAttempt, FeedbackLevel level, HashSet<char> alphabet, DFAEditScript script, double utility, CharSetSolver solver)
             : base(level, alphabet, utility, solver)
         {
             var positiveDifference = dfaGoal.Minus(dfaAttempt, solver).Determinize(solver).Minimize(solver);
@@ -248,18 +248,18 @@ namespace AutomataPDL
     /// </summary>
     class DensityFeedback : DFAFeedback
     {
-        Automaton<BvSet> positiveDifference;
-        Automaton<BvSet> negativeDifference;
-        Automaton<BvSet> symmetricDifference;
+        Automaton<BDD> positiveDifference;
+        Automaton<BDD> negativeDifference;
+        Automaton<BDD> symmetricDifference;
 
-        public DensityFeedback(FeedbackLevel level, HashSet<char> alphabet, Automaton<BvSet> dfaGoal, Automaton<BvSet> dfaAttempt, double utility, CharSetSolver solver)
+        public DensityFeedback(FeedbackLevel level, HashSet<char> alphabet, Automaton<BDD> dfaGoal, Automaton<BDD> dfaAttempt, double utility, CharSetSolver solver)
             : base(level, alphabet, utility,solver)
         {
-            BvSet pred = solver.False;
+            BDD pred = solver.False;
             foreach (var el in alphabet)
                 pred=solver.MkOr(pred,solver.MkCharConstraint(false,el));
 
-            var dfaAll = Automaton<BvSet>.Create(0,new int[]{0},new Move<BvSet>[]{new Move<BvSet>(0,0,pred)});
+            var dfaAll = Automaton<BDD>.Create(0,new int[]{0},new Move<BDD>[]{new Move<BDD>(0,0,pred)});
             this.type = FeedbackType.Density;
             this.positiveDifference = dfaGoal.Minus(dfaAttempt, solver).Determinize(solver).Minimize(solver);
             this.negativeDifference = dfaAttempt.Minus(dfaGoal, solver).Determinize(solver).Minimize(solver);

@@ -194,16 +194,16 @@ namespace TestPDL
 
             var a = solver.MkCharConstraint(false, 'a');
             var b = solver.MkCharConstraint(false, 'b');
-            var moves = new List<Move<BvSet>>();
+            var moves = new List<Move<BDD>>();
 
-            moves.Add(new Move<BvSet>(0, 0, b));
-            moves.Add(new Move<BvSet>(0, 1, a));
-            moves.Add(new Move<BvSet>(1, 1, a));
-            moves.Add(new Move<BvSet>(1, 2, b));
-            moves.Add(new Move<BvSet>(2, 2, a));
-            moves.Add(new Move<BvSet>(2, 2, b));
+            moves.Add(new Move<BDD>(0, 0, b));
+            moves.Add(new Move<BDD>(0, 1, a));
+            moves.Add(new Move<BDD>(1, 1, a));
+            moves.Add(new Move<BDD>(1, 2, b));
+            moves.Add(new Move<BDD>(2, 2, a));
+            moves.Add(new Move<BDD>(2, 2, b));
 
-            var dfa = Automaton<BvSet>.Create(0, new int[] { 2 }, moves).Determinize(solver).Minimize(solver);
+            var dfa = Automaton<BDD>.Create(0, new int[] { 2 }, moves).Determinize(solver).Minimize(solver);
 
             PrintDFA(dfa, "Test21", al);
         }
@@ -215,23 +215,23 @@ namespace TestPDL
             var alph = new List<char> { 'a', 'b' };
             var al = new HashSet<char>(alph);
 
-            var moves = new List<Move<BvSet>>();
+            var moves = new List<Move<BDD>>();
 
             var a = solver.MkCharConstraint(false, 'a');
             var b = solver.MkCharConstraint(false, 'b');
 
-            moves.Add(new Move<BvSet>(0, 1, a));
-            moves.Add(new Move<BvSet>(0, 4, b));
-            moves.Add(new Move<BvSet>(1, 4, a));
-            moves.Add(new Move<BvSet>(1, 2, b));
-            moves.Add(new Move<BvSet>(2, 3, a));
-            moves.Add(new Move<BvSet>(2, 3, b));
-            moves.Add(new Move<BvSet>(3, 2, a));
-            moves.Add(new Move<BvSet>(3, 2, b));
-            moves.Add(new Move<BvSet>(4, 4, a));
-            moves.Add(new Move<BvSet>(4, 4, b));
+            moves.Add(new Move<BDD>(0, 1, a));
+            moves.Add(new Move<BDD>(0, 4, b));
+            moves.Add(new Move<BDD>(1, 4, a));
+            moves.Add(new Move<BDD>(1, 2, b));
+            moves.Add(new Move<BDD>(2, 3, a));
+            moves.Add(new Move<BDD>(2, 3, b));
+            moves.Add(new Move<BDD>(3, 2, a));
+            moves.Add(new Move<BDD>(3, 2, b));
+            moves.Add(new Move<BDD>(4, 4, a));
+            moves.Add(new Move<BDD>(4, 4, b));
 
-            var dfa = Automaton<BvSet>.Create(0, new int[] { 2 }, moves).Determinize(solver).Minimize(solver);
+            var dfa = Automaton<BDD>.Create(0, new int[] { 2 }, moves).Determinize(solver).Minimize(solver);
 
             PrintDFA(dfa, "Test22", al);
         }
@@ -246,14 +246,14 @@ namespace TestPDL
             var a = solver.MkCharConstraint(false, 'a');
             var b = solver.MkCharConstraint(false, 'b');
 
-            var moves = new List<Move<BvSet>>();
-            moves.Add(new Move<BvSet>(0, 1, b));
-            moves.Add(new Move<BvSet>(1, 2, a));
-            moves.Add(new Move<BvSet>(2, 3, b));
-            moves.Add(new Move<BvSet>(3, 3, a));
-            moves.Add(new Move<BvSet>(3, 3, b));
+            var moves = new List<Move<BDD>>();
+            moves.Add(new Move<BDD>(0, 1, b));
+            moves.Add(new Move<BDD>(1, 2, a));
+            moves.Add(new Move<BDD>(2, 3, b));
+            moves.Add(new Move<BDD>(3, 3, a));
+            moves.Add(new Move<BDD>(3, 3, b));
 
-            var dfa = Automaton<BvSet>.Create(0, new int[] { 3 }, moves).Determinize(solver).Minimize(solver);
+            var dfa = Automaton<BDD>.Create(0, new int[] { 3 }, moves).Determinize(solver).Minimize(solver);
 
             PrintDFA(dfa, "Test23", al);
         }
@@ -268,12 +268,12 @@ namespace TestPDL
             var a = solver.MkCharConstraint(false, 'a');
             var b = solver.MkCharConstraint(false, 'b');
 
-            var moves = new List<Move<BvSet>>();
-            moves.Add(new Move<BvSet>(0, 0, a)); moves.Add(new Move<BvSet>(0, 1, b));
-            moves.Add(new Move<BvSet>(1, 1, b)); moves.Add(new Move<BvSet>(1, 2, a));
-            moves.Add(new Move<BvSet>(2, 2, a)); moves.Add(new Move<BvSet>(2, 2, b));
+            var moves = new List<Move<BDD>>();
+            moves.Add(new Move<BDD>(0, 0, a)); moves.Add(new Move<BDD>(0, 1, b));
+            moves.Add(new Move<BDD>(1, 1, b)); moves.Add(new Move<BDD>(1, 2, a));
+            moves.Add(new Move<BDD>(2, 2, a)); moves.Add(new Move<BDD>(2, 2, b));
 
-            var dfa = Automaton<BvSet>.Create(0, new int[] { 2 }, moves).Determinize(solver).Minimize(solver);
+            var dfa = Automaton<BDD>.Create(0, new int[] { 2 }, moves).Determinize(solver).Minimize(solver);
 
             PrintDFA(dfa, "Test24", al);
         }
@@ -288,13 +288,13 @@ namespace TestPDL
             var a = solver.MkCharConstraint(false, 'a');
             var b = solver.MkCharConstraint(false, 'b');
 
-            var moves = new List<Move<BvSet>>();
-            moves.Add(new Move<BvSet>(0, 0, a)); moves.Add(new Move<BvSet>(0, 1, b));
-            moves.Add(new Move<BvSet>(1, 0, a)); moves.Add(new Move<BvSet>(1, 2, b));
-            moves.Add(new Move<BvSet>(2, 3, a)); moves.Add(new Move<BvSet>(2, 2, b));
-            moves.Add(new Move<BvSet>(3, 3, a)); moves.Add(new Move<BvSet>(3, 3, b));
+            var moves = new List<Move<BDD>>();
+            moves.Add(new Move<BDD>(0, 0, a)); moves.Add(new Move<BDD>(0, 1, b));
+            moves.Add(new Move<BDD>(1, 0, a)); moves.Add(new Move<BDD>(1, 2, b));
+            moves.Add(new Move<BDD>(2, 3, a)); moves.Add(new Move<BDD>(2, 2, b));
+            moves.Add(new Move<BDD>(3, 3, a)); moves.Add(new Move<BDD>(3, 3, b));
 
-            var dfa = Automaton<BvSet>.Create(0, new int[] { 3 }, moves).Determinize(solver).Minimize(solver);
+            var dfa = Automaton<BDD>.Create(0, new int[] { 3 }, moves).Determinize(solver).Minimize(solver);
 
             PrintDFA(dfa, "Test25", al);
 
@@ -310,12 +310,12 @@ namespace TestPDL
             var a = solver.MkCharConstraint(false, 'a');
             var b = solver.MkCharConstraint(false, 'b');
 
-            var moves = new List<Move<BvSet>>();
-            moves.Add(new Move<BvSet>(0, 3, a)); moves.Add(new Move<BvSet>(0, 1, b));
-            moves.Add(new Move<BvSet>(1, 2, a)); moves.Add(new Move<BvSet>(1, 1, b));
-            moves.Add(new Move<BvSet>(3, 3, a));
+            var moves = new List<Move<BDD>>();
+            moves.Add(new Move<BDD>(0, 3, a)); moves.Add(new Move<BDD>(0, 1, b));
+            moves.Add(new Move<BDD>(1, 2, a)); moves.Add(new Move<BDD>(1, 1, b));
+            moves.Add(new Move<BDD>(3, 3, a));
 
-            var dfa = Automaton<BvSet>.Create(0, new int[] { 2, 3 }, moves).Determinize(solver).Minimize(solver);
+            var dfa = Automaton<BDD>.Create(0, new int[] { 2, 3 }, moves).Determinize(solver).Minimize(solver);
 
             PrintDFA(dfa, "Test26", al);
         }
@@ -330,21 +330,21 @@ namespace TestPDL
             var a = solver.MkCharConstraint(false, 'a');
             var b = solver.MkCharConstraint(false, 'b');
 
-            var moves = new List<Move<BvSet>>();
-            moves.Add(new Move<BvSet>(0, 3, a)); moves.Add(new Move<BvSet>(0, 1, b));
+            var moves = new List<Move<BDD>>();
+            moves.Add(new Move<BDD>(0, 3, a)); moves.Add(new Move<BDD>(0, 1, b));
 
-            moves.Add(new Move<BvSet>(1, 4, a)); moves.Add(new Move<BvSet>(1, 2, b));
+            moves.Add(new Move<BDD>(1, 4, a)); moves.Add(new Move<BDD>(1, 2, b));
 
-            moves.Add(new Move<BvSet>(2, 5, a)); moves.Add(new Move<BvSet>(2, 0, b));
+            moves.Add(new Move<BDD>(2, 5, a)); moves.Add(new Move<BDD>(2, 0, b));
 
-            moves.Add(new Move<BvSet>(3, 0, a)); moves.Add(new Move<BvSet>(3, 4, b));
+            moves.Add(new Move<BDD>(3, 0, a)); moves.Add(new Move<BDD>(3, 4, b));
 
-            moves.Add(new Move<BvSet>(4, 1, a)); moves.Add(new Move<BvSet>(4, 5, b));
+            moves.Add(new Move<BDD>(4, 1, a)); moves.Add(new Move<BDD>(4, 5, b));
 
-            moves.Add(new Move<BvSet>(5, 2, a)); moves.Add(new Move<BvSet>(5, 3, b));
+            moves.Add(new Move<BDD>(5, 2, a)); moves.Add(new Move<BDD>(5, 3, b));
 
 
-            var dfa = Automaton<BvSet>.Create(0, new int[] { 0 }, moves).Determinize(solver).Minimize(solver);
+            var dfa = Automaton<BDD>.Create(0, new int[] { 0 }, moves).Determinize(solver).Minimize(solver);
 
             PrintDFA(dfa, "Test27", al);
 
@@ -360,14 +360,14 @@ namespace TestPDL
             var a = solver.MkCharConstraint(false, 'a');
             var b = solver.MkCharConstraint(false, 'b');
 
-            var moves = new List<Move<BvSet>>();
-            moves.Add(new Move<BvSet>(0, 0, a)); moves.Add(new Move<BvSet>(0, 1, b));
-            moves.Add(new Move<BvSet>(1, 0, a)); moves.Add(new Move<BvSet>(1, 2, b));
-            moves.Add(new Move<BvSet>(2, 2, b));
-            moves.Add(new Move<BvSet>(2, 3, a)); moves.Add(new Move<BvSet>(3, 3, a)); moves.Add(new Move<BvSet>(3, 3, b));
+            var moves = new List<Move<BDD>>();
+            moves.Add(new Move<BDD>(0, 0, a)); moves.Add(new Move<BDD>(0, 1, b));
+            moves.Add(new Move<BDD>(1, 0, a)); moves.Add(new Move<BDD>(1, 2, b));
+            moves.Add(new Move<BDD>(2, 2, b));
+            moves.Add(new Move<BDD>(2, 3, a)); moves.Add(new Move<BDD>(3, 3, a)); moves.Add(new Move<BDD>(3, 3, b));
 
 
-            var dfa = Automaton<BvSet>.Create(0, new int[] { 0, 1, 2 }, moves).Determinize(solver).Minimize(solver);
+            var dfa = Automaton<BDD>.Create(0, new int[] { 0, 1, 2 }, moves).Determinize(solver).Minimize(solver);
 
             PrintDFA(dfa, "Test28", al);
 
@@ -451,13 +451,13 @@ namespace TestPDL
             var a = solver.MkCharConstraint(false, 'a');
             var b = solver.MkCharConstraint(false, 'b');
 
-            var moves = new List<Move<BvSet>>();
-            moves.Add(new Move<BvSet>(0, 0, a)); moves.Add(new Move<BvSet>(0, 1, b));
-            moves.Add(new Move<BvSet>(1, 2, a)); moves.Add(new Move<BvSet>(1, 1, b));
-            moves.Add(new Move<BvSet>(2, 0, a)); moves.Add(new Move<BvSet>(2, 3, b));
-            moves.Add(new Move<BvSet>(3, 2, a)); moves.Add(new Move<BvSet>(3, 1, b));
+            var moves = new List<Move<BDD>>();
+            moves.Add(new Move<BDD>(0, 0, a)); moves.Add(new Move<BDD>(0, 1, b));
+            moves.Add(new Move<BDD>(1, 2, a)); moves.Add(new Move<BDD>(1, 1, b));
+            moves.Add(new Move<BDD>(2, 0, a)); moves.Add(new Move<BDD>(2, 3, b));
+            moves.Add(new Move<BDD>(3, 2, a)); moves.Add(new Move<BDD>(3, 1, b));
 
-            var dfa = Automaton<BvSet>.Create(0, new int[] { 3 }, moves).Determinize(solver).Minimize(solver);
+            var dfa = Automaton<BDD>.Create(0, new int[] { 3 }, moves).Determinize(solver).Minimize(solver);
 
             PrintDFA(dfa, "Test37", al);
         }
@@ -472,12 +472,12 @@ namespace TestPDL
             var a = solver.MkCharConstraint(false, 'a');
             var b = solver.MkCharConstraint(false, 'b');
 
-            var moves = new List<Move<BvSet>>();
-            moves.Add(new Move<BvSet>(0, 0, a)); moves.Add(new Move<BvSet>(0, 1, b));
-            moves.Add(new Move<BvSet>(1, 2, a)); moves.Add(new Move<BvSet>(1, 1, b));
-            moves.Add(new Move<BvSet>(2, 2, a)); moves.Add(new Move<BvSet>(2, 2, b));
+            var moves = new List<Move<BDD>>();
+            moves.Add(new Move<BDD>(0, 0, a)); moves.Add(new Move<BDD>(0, 1, b));
+            moves.Add(new Move<BDD>(1, 2, a)); moves.Add(new Move<BDD>(1, 1, b));
+            moves.Add(new Move<BDD>(2, 2, a)); moves.Add(new Move<BDD>(2, 2, b));
 
-            var dfa = Automaton<BvSet>.Create(0, new int[] { 1 }, moves).Determinize(solver).Minimize(solver);
+            var dfa = Automaton<BDD>.Create(0, new int[] { 1 }, moves).Determinize(solver).Minimize(solver);
 
             PrintDFA(dfa, "Test38", al);
         }
@@ -492,11 +492,11 @@ namespace TestPDL
             var a = solver.MkCharConstraint(false, 'a');
             var b = solver.MkCharConstraint(false, 'b');
 
-            var moves = new List<Move<BvSet>>();
-            moves.Add(new Move<BvSet>(0, 0, a)); moves.Add(new Move<BvSet>(0, 1, a));
-            moves.Add(new Move<BvSet>(1, 1, a)); moves.Add(new Move<BvSet>(1, 0, b));
+            var moves = new List<Move<BDD>>();
+            moves.Add(new Move<BDD>(0, 0, a)); moves.Add(new Move<BDD>(0, 1, a));
+            moves.Add(new Move<BDD>(1, 1, a)); moves.Add(new Move<BDD>(1, 0, b));
 
-            var dfa = Automaton<BvSet>.Create(0, new int[] { 0 }, moves).Determinize(solver).Minimize(solver);
+            var dfa = Automaton<BDD>.Create(0, new int[] { 0 }, moves).Determinize(solver).Minimize(solver);
 
             PrintDFA(dfa, "Test39", al);
         }
@@ -535,7 +535,7 @@ namespace TestPDL
             PrintDFA(phi.GetDFA(al, solver), name, al);
         }
 
-        private static void PrintDFA(Automaton<BvSet> dfa, string name, HashSet<char> al)
+        private static void PrintDFA(Automaton<BDD> dfa, string name, HashSet<char> al)
         {
             var sb = new StringBuilder();
             DFAUtilities.printDFA(dfa, al, sb);

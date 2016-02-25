@@ -157,7 +157,9 @@ namespace ProblemGenerationTest
         {
             Testcase testcase = TestPredicateFactory.createTestFormula21();
             RunAndOutputBenchmarkSet(testcase);
-        }        [TestMethod]
+        }
+
+        [TestMethod]
         public void Measure_22()
         {
             Testcase testcase = TestPredicateFactory.createTestFormula22();
@@ -167,7 +169,7 @@ namespace ProblemGenerationTest
         public void RunAndOutputBenchmarkSet(Testcase testcase)
         {
             IDictionary<PDLPred, Measurement.SingleMeasurementResult> cache = new Dictionary<PDLPred, Measurement.SingleMeasurementResult>();
-            IDictionary<Automaton<BvSet>, Measurement.SingleMeasurementResult> automatonCache = new Dictionary<Automaton<BvSet>, Measurement.SingleMeasurementResult>();
+            IDictionary<Automaton<BDD>, Measurement.SingleMeasurementResult> automatonCache = new Dictionary<Automaton<BDD>, Measurement.SingleMeasurementResult>();
             foreach (VariableCache.ConstraintMode constraintMode in System.Enum.GetValues(typeof(VariableCache.ConstraintMode)))
             {
                 foreach (PdlFilter.Filtermode filtermode in System.Enum.GetValues(typeof(PdlFilter.Filtermode)))
@@ -181,7 +183,7 @@ namespace ProblemGenerationTest
             }
         }
 
-        public Measurement.MeasurementResultSet RunBenchmark(Testcase testcase, VariableCache.ConstraintMode constraintMode, PdlFilter.Filtermode filtermode, IDictionary<PDLPred, Measurement.SingleMeasurementResult> cache, IDictionary<Automaton<BvSet>, Measurement.SingleMeasurementResult> automatonCache)
+        public Measurement.MeasurementResultSet RunBenchmark(Testcase testcase, VariableCache.ConstraintMode constraintMode, PdlFilter.Filtermode filtermode, IDictionary<PDLPred, Measurement.SingleMeasurementResult> cache, IDictionary<Automaton<BDD>, Measurement.SingleMeasurementResult> automatonCache)
         {
             ICollection<PDLPred> bareResults = new LinkedList<PDLPred>();
 

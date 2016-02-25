@@ -4,24 +4,17 @@ using System.Linq;
 using System.Text;
 
 using Microsoft.Automata;
-using Microsoft.Automata.Z3;
-using Microsoft.Z3;
-
-using SFAz3 = Microsoft.Automata.SFA<Microsoft.Z3.FuncDecl, Microsoft.Z3.Expr, Microsoft.Z3.Sort>;
-using STz3 = Microsoft.Automata.ST<Microsoft.Z3.FuncDecl, Microsoft.Z3.Expr, Microsoft.Z3.Sort>;
-using Rulez3 = Microsoft.Automata.Rule<Microsoft.Z3.Expr>;
-using STBuilderZ3 = Microsoft.Automata.STBuilder<Microsoft.Z3.FuncDecl, Microsoft.Z3.Expr, Microsoft.Z3.Sort>;
 
 namespace MSOZ3
 {
 
     public abstract class WS1SFormula
     {
-        internal abstract Automaton<BvSet> getDFA(List<string> variables, BvSet alphabet, CharSetSolver solver);
+        internal abstract Automaton<BDD> getDFA(List<string> variables, BDD alphabet, CharSetSolver solver);
 
         public abstract void ToString(StringBuilder sb);
 
-        public Automaton<BvSet> getDFA(HashSet<char> alphabet, CharSetSolver solver)
+        public Automaton<BDD> getDFA(HashSet<char> alphabet, CharSetSolver solver)
         {            
             //Predicate representing the alphabet
             var alphPred = solver.False;
@@ -30,25 +23,25 @@ namespace MSOZ3
             
             var dfa1 =  this.Normalize(solver).PushQuantifiers().getDFA(new List<string>(), alphPred, solver);
 
-            var moves = new List<Move<BvSet>>();
+            var moves = new List<Move<BDD>>();
             foreach (var move in dfa1.GetMoves())
-                foreach (var ch in solver.GenerateAllCharacters(solver.MkAnd(move.Condition,alphPred),false))                
-                    moves.Add(new Move<BvSet>(move.SourceState,move.TargetState,solver.MkCharConstraint(false,ch)));
+                foreach (var ch in solver.GenerateAllCharacters(solver.MkAnd(move.Label,alphPred),false))                
+                    moves.Add(new Move<BDD>(move.SourceState,move.TargetState,solver.MkCharConstraint(false,ch)));
 
-            return Automaton<BvSet>.Create(dfa1.InitialState,dfa1.GetFinalStates(),moves,true,true).Determinize(solver).Minimize(solver);
+            return Automaton<BDD>.Create(dfa1.InitialState,dfa1.GetFinalStates(),moves,true,true).Determinize(solver).Minimize(solver);
         }
 
-        public Automaton<BvSet> getDFA(BvSet alphabet, CharSetSolver solver)
+        public Automaton<BDD> getDFA(BDD alphabet, CharSetSolver solver)
         {
             var opt = this.Normalize(solver).PushQuantifiers();
             var dfa1= opt.getDFA(new List<string>(), alphabet, solver);
 
-            var moves = new List<Move<BvSet>>();
+            var moves = new List<Move<BDD>>();
             foreach (var move in dfa1.GetMoves())
             {
-                moves.Add(new Move<BvSet>(move.SourceState, move.TargetState, solver.MkAnd(move.Condition, alphabet)));                
+                moves.Add(new Move<BDD>(move.SourceState, move.TargetState, solver.MkAnd(move.Label, alphabet)));                
             }
-            return Automaton<BvSet>.Create(dfa1.InitialState, dfa1.GetFinalStates(), moves, true, true).Determinize(solver).Minimize(solver);
+            return Automaton<BDD>.Create(dfa1.InitialState, dfa1.GetFinalStates(), moves, true, true).Determinize(solver).Minimize(solver);
         }
 
         public abstract WS1SFormula Normalize(CharSetSolver solver);
@@ -69,7 +62,7 @@ namespace MSOZ3
 
     public class WS1SExists : WS1SFormula
     {
-        private static Dictionary<BvSet, BvSet> hashedSets = new Dictionary<BvSet, BvSet>();
+        private static Dictionary<BDD, BDD> hashedSets = new Dictionary<BDD, BDD>();
 
         String variable;
         WS1SFormula phi;
@@ -80,22 +73,22 @@ namespace MSOZ3
             this.variable = variable;
         }
 
-        internal override Automaton<BvSet> getDFA(List<string> variables, BvSet alphabet, CharSetSolver solver)
+        internal override Automaton<BDD> getDFA(List<string> variables, BDD alphabet, CharSetSolver solver)
         {
-            //Automaton<BvSet> for formula
+            //Automaton<BDD> for formula
             var varCopy = new List<string>(variables);
             varCopy.Insert(0, variable);
             var autPhi = phi.getDFA(varCopy, alphabet, solver);
 
             //Remove first bit from each move
-            var newMoves = new List<Move<BvSet>>();
+            var newMoves = new List<Move<BDD>>();
             foreach (var move in autPhi.GetMoves())
             {
-                var newCond = solver.LShiftRight(move.Condition);
-                newMoves.Add(new Move<BvSet>(move.SourceState, move.TargetState, newCond));
+                var newCond = solver.LShiftRight(move.Label);
+                newMoves.Add(new Move<BDD>(move.SourceState, move.TargetState, newCond));
             }
 
-            var dfanew = Automaton<BvSet>.Create(autPhi.InitialState, autPhi.GetFinalStates(), newMoves).Determinize(solver);
+            var dfanew = Automaton<BDD>.Create(autPhi.InitialState, autPhi.GetFinalStates(), newMoves).Determinize(solver);
             var dfamin = dfanew.Minimize(solver);
 
             return dfamin;
@@ -126,7 +119,7 @@ namespace MSOZ3
             this.right = right;
         }
 
-        internal override Automaton<BvSet> getDFA(List<string> variables, BvSet alphabet, CharSetSolver solver)
+        internal override Automaton<BDD> getDFA(List<string> variables, BDD alphabet, CharSetSolver solver)
         {
             var aut1 = left.getDFA(variables, alphabet,solver);
             var aut2 = right.getDFA(variables, alphabet,solver);
@@ -177,7 +170,7 @@ namespace MSOZ3
             this.right = right;
         }
 
-        internal override Automaton<BvSet> getDFA(List<string> variables, BvSet alphabet, CharSetSolver solver)
+        internal override Automaton<BDD> getDFA(List<string> variables, BDD alphabet, CharSetSolver solver)
         {
             var aut1 = left.getDFA(variables, alphabet, solver);
             var aut2 = right.getDFA(variables, alphabet, solver);
@@ -225,14 +218,14 @@ namespace MSOZ3
             this.phi = phi;
         }
 
-        internal override Automaton<BvSet> getDFA(List<string> variables, BvSet alphabet, CharSetSolver solver)
+        internal override Automaton<BDD> getDFA(List<string> variables, BDD alphabet, CharSetSolver solver)
         {
             //Create condition that only considerst bv of size |variables|
             var trueBv = solver.MkSetFromRange(0, (uint)(Math.Pow(2, variables.Count + 7) - 1), variables.Count + 7 - 1);
-            var moves = new Move<BvSet>[] { new Move<BvSet>(0, 0, trueBv) };
+            var moves = new Move<BDD>[] { new Move<BDD>(0, 0, trueBv) };
 
             //True automaton and then difference
-            var trueAut = Automaton<BvSet>.Create(0, new int[] { 0 }, moves);
+            var trueAut = Automaton<BDD>.Create(0, new int[] { 0 }, moves);
             var aut = phi.getDFA(variables, alphabet, solver);
 
             return trueAut.Minus(aut, solver).Determinize(solver).Minimize(solver);
@@ -262,28 +255,28 @@ namespace MSOZ3
 
     public class WS1STrue : WS1SFormula
     {
-        private static Dictionary<Pair<BvSet, int>, Automaton<BvSet>> hashedDfa = new Dictionary<Pair<BvSet, int>, Automaton<BvSet>>();
+        private static Dictionary<Pair<BDD, int>, Automaton<BDD>> hashedDfa = new Dictionary<Pair<BDD, int>, Automaton<BDD>>();
 
         public WS1STrue() { }
 
-        internal static Automaton<BvSet> computeDFA(List<string> variables, BvSet alphabet, CharSetSolver solver)
+        internal static Automaton<BDD> computeDFA(List<string> variables, BDD alphabet, CharSetSolver solver)
         {
-            var hash = new Pair<BvSet, int>(alphabet, variables.Count);
+            var hash = new Pair<BDD, int>(alphabet, variables.Count);
             if (hashedDfa.ContainsKey(hash))
                 return hashedDfa[hash];
 
             //Create condition that only considerst bv of size |variables|
             var trueBv = solver.MkSetFromRange(0, (uint)(Math.Pow(2, variables.Count + 7) - 1), variables.Count + 7-1);
-            var moves = new Move<BvSet>[] { new Move<BvSet>(0, 0, trueBv) };
+            var moves = new Move<BDD>[] { new Move<BDD>(0, 0, trueBv) };
             //True automaton 
-            var dfa = Automaton<BvSet>.Create(0, new int[] { 0 }, moves);
+            var dfa = Automaton<BDD>.Create(0, new int[] { 0 }, moves);
             hashedDfa[hash] = dfa;
 
             return dfa;
         }
 
 
-        internal override Automaton<BvSet> getDFA(List<string> variables, BvSet alphabet, CharSetSolver solver)
+        internal override Automaton<BDD> getDFA(List<string> variables, BDD alphabet, CharSetSolver solver)
         {
             return WS1STrue.computeDFA(variables, alphabet, solver);
         }
@@ -304,9 +297,9 @@ namespace MSOZ3
 
         public WS1SFalse() { }
 
-        internal override Automaton<BvSet> getDFA(List<string> variables, BvSet alphabet, CharSetSolver solver)
+        internal override Automaton<BDD> getDFA(List<string> variables, BDD alphabet, CharSetSolver solver)
         {
-            return Automaton<BvSet>.Empty;
+            return Automaton<BDD>.Empty;
         }
 
         public override void ToString(StringBuilder sb)
@@ -322,7 +315,7 @@ namespace MSOZ3
 
     public class WS1SLast : WS1SFormula
     {
-        private static Dictionary<BvSet, Dictionary<Pair<int, int>, Automaton<BvSet>>> hashedDfa = new Dictionary<BvSet, Dictionary<Pair<int, int>, Automaton<BvSet>>>();
+        private static Dictionary<BDD, Dictionary<Pair<int, int>, Automaton<BDD>>> hashedDfa = new Dictionary<BDD, Dictionary<Pair<int, int>, Automaton<BDD>>>();
 
         string var1;
 
@@ -330,13 +323,13 @@ namespace MSOZ3
             this.var1 = var1;
         }
 
-        internal override Automaton<BvSet> getDFA(List<string> variables, BvSet alphabet, CharSetSolver solver)
+        internal override Automaton<BDD> getDFA(List<string> variables, BDD alphabet, CharSetSolver solver)
         {
             int varbit = variables.IndexOf(var1);
 
-            Dictionary<Pair<int, int>, Automaton<BvSet>> dic;
+            Dictionary<Pair<int, int>, Automaton<BDD>> dic;
             if (!hashedDfa.ContainsKey(alphabet))
-                hashedDfa[alphabet] = new Dictionary<Pair<int, int>, Automaton<BvSet>>();
+                hashedDfa[alphabet] = new Dictionary<Pair<int, int>, Automaton<BDD>>();
 
             dic = hashedDfa[alphabet];
 
@@ -350,12 +343,12 @@ namespace MSOZ3
             var posis0 = solver.MkAnd(trueBv, solver.MkSetWithBitFalse(varbit));
 
             //Create automaton for condition
-            var moves = new Move<BvSet>[] { 
-                new Move<BvSet>(0, 0, posis0),
-                new Move<BvSet>(0, 1, posis1) 
+            var moves = new Move<BDD>[] { 
+                new Move<BDD>(0, 0, posis0),
+                new Move<BDD>(0, 1, posis1) 
             };
 
-            var dfa = Automaton<BvSet>.Create(0, new int[] { 1 }, moves).Determinize(solver).Minimize(solver);
+            var dfa = Automaton<BDD>.Create(0, new int[] { 1 }, moves).Determinize(solver).Minimize(solver);
             dic[hash] = dfa;
 
             return dfa;
@@ -374,7 +367,7 @@ namespace MSOZ3
 
     public class WS1SFirst : WS1SFormula
     {
-        private static Dictionary<BvSet, Dictionary<Pair<int, int>, Automaton<BvSet>>> hashedDfa = new Dictionary<BvSet, Dictionary<Pair<int, int>, Automaton<BvSet>>>();
+        private static Dictionary<BDD, Dictionary<Pair<int, int>, Automaton<BDD>>> hashedDfa = new Dictionary<BDD, Dictionary<Pair<int, int>, Automaton<BDD>>>();
 
         string var1;
 
@@ -382,13 +375,13 @@ namespace MSOZ3
             this.var1 = var1;
         }
 
-        internal override Automaton<BvSet> getDFA(List<string> variables, BvSet alphabet, CharSetSolver solver)
+        internal override Automaton<BDD> getDFA(List<string> variables, BDD alphabet, CharSetSolver solver)
         {
             int varbit = variables.IndexOf(var1);
 
-            Dictionary<Pair<int, int>, Automaton<BvSet>> dic;
+            Dictionary<Pair<int, int>, Automaton<BDD>> dic;
             if (!hashedDfa.ContainsKey(alphabet))
-                hashedDfa[alphabet] = new Dictionary<Pair<int, int>, Automaton<BvSet>>();
+                hashedDfa[alphabet] = new Dictionary<Pair<int, int>, Automaton<BDD>>();
 
             dic = hashedDfa[alphabet];
 
@@ -402,12 +395,12 @@ namespace MSOZ3
             var posis0 = solver.MkAnd(trueBv, solver.MkSetWithBitFalse(varbit));
 
             //Create automaton for condition
-            var moves = new Move<BvSet>[] { 
-                new Move<BvSet>(0, 1, posis1),
-                new Move<BvSet>(1, 1, posis0) 
+            var moves = new Move<BDD>[] { 
+                new Move<BDD>(0, 1, posis1),
+                new Move<BDD>(1, 1, posis0) 
             };
 
-            var dfa = Automaton<BvSet>.Create(0, new int[] { 1 }, moves).Determinize(solver).Minimize(solver);
+            var dfa = Automaton<BDD>.Create(0, new int[] { 1 }, moves).Determinize(solver).Minimize(solver);
             dic[hash] = dfa;
 
             return dfa;
@@ -426,7 +419,7 @@ namespace MSOZ3
 
     public class WS1SSubset : WS1SFormula
     {
-        private static Dictionary<BvSet, Dictionary<int, Dictionary<Pair<int, int>, Automaton<BvSet>>>> hashedDfa = new Dictionary<BvSet, Dictionary<int, Dictionary<Pair<int, int>, Automaton<BvSet>>>>();
+        private static Dictionary<BDD, Dictionary<int, Dictionary<Pair<int, int>, Automaton<BDD>>>> hashedDfa = new Dictionary<BDD, Dictionary<int, Dictionary<Pair<int, int>, Automaton<BDD>>>>();
         private static bool hashing = false;
 
         string set1, set2;
@@ -437,22 +430,22 @@ namespace MSOZ3
             this.set2 = set2;
         }
 
-        internal static Automaton<BvSet> computeDFA(List<string> variables, BvSet alphabet, CharSetSolver solver, string set1, string set2)
+        internal static Automaton<BDD> computeDFA(List<string> variables, BDD alphabet, CharSetSolver solver, string set1, string set2)
         {
             var pos1 = variables.IndexOf(set1);
             var pos2 = variables.IndexOf(set2);
 
-            Dictionary<Pair<int, int>, Automaton<BvSet>> dic1 = null;
+            Dictionary<Pair<int, int>, Automaton<BDD>> dic1 = null;
             Pair<int, int> pair = null;
             if (hashing)
             {
                 if (!hashedDfa.ContainsKey(alphabet))
-                    hashedDfa[alphabet] = new Dictionary<int, Dictionary<Pair<int, int>, Automaton<BvSet>>>();
+                    hashedDfa[alphabet] = new Dictionary<int, Dictionary<Pair<int, int>, Automaton<BDD>>>();
 
                 var dic = hashedDfa[alphabet];
 
                 if (!dic.ContainsKey(variables.Count))
-                    dic[variables.Count] = new Dictionary<Pair<int, int>, Automaton<BvSet>>();
+                    dic[variables.Count] = new Dictionary<Pair<int, int>, Automaton<BDD>>();
 
                 dic1 = dic[variables.Count];
 
@@ -470,15 +463,15 @@ namespace MSOZ3
 
 
             //Create automaton for condition
-            var moves = new Move<BvSet>[] { new Move<BvSet>(0, 0, subsetCond) };
+            var moves = new Move<BDD>[] { new Move<BDD>(0, 0, subsetCond) };
 
-            var dfa = Automaton<BvSet>.Create(0, new int[] { 0 }, moves).Determinize(solver).Minimize(solver);
+            var dfa = Automaton<BDD>.Create(0, new int[] { 0 }, moves).Determinize(solver).Minimize(solver);
             if(hashing)
                 dic1[pair] = dfa;
             return dfa;
         }
 
-        internal override Automaton<BvSet> getDFA(List<string> variables, BvSet alphabet, CharSetSolver solver)
+        internal override Automaton<BDD> getDFA(List<string> variables, BDD alphabet, CharSetSolver solver)
         {
             //Build DFA corresponding to regexp
             return computeDFA(variables, alphabet, solver, set1, set2);
@@ -496,7 +489,7 @@ namespace MSOZ3
 
     public class WS1SSingleton : WS1SFormula
     {
-        private static Dictionary<BvSet, Dictionary<Pair<int, int>, Automaton<BvSet>>> hashedDfa = new Dictionary<BvSet, Dictionary<Pair<int, int>, Automaton<BvSet>>>();
+        private static Dictionary<BDD, Dictionary<Pair<int, int>, Automaton<BDD>>> hashedDfa = new Dictionary<BDD, Dictionary<Pair<int, int>, Automaton<BDD>>>();
         private static bool hashing = false;
 
         string set;
@@ -506,13 +499,13 @@ namespace MSOZ3
             this.set = set;
         }
 
-        internal static Automaton<BvSet> computeDFA(List<string> variables, BvSet alphabet, CharSetSolver solver, string set)
+        internal static Automaton<BDD> computeDFA(List<string> variables, BDD alphabet, CharSetSolver solver, string set)
         {
             int setbit = variables.IndexOf(set);
 
-            Dictionary<Pair<int, int>, Automaton<BvSet>> dic;
+            Dictionary<Pair<int, int>, Automaton<BDD>> dic;
             if (!hashedDfa.ContainsKey(alphabet))
-                hashedDfa[alphabet] = new Dictionary<Pair<int, int>, Automaton<BvSet>>();
+                hashedDfa[alphabet] = new Dictionary<Pair<int, int>, Automaton<BDD>>();
 
             dic = hashedDfa[alphabet];
 
@@ -526,20 +519,20 @@ namespace MSOZ3
             var posIs0 = solver.MkAnd(trueBv, solver.MkSetWithBitFalse(setbit));
 
             //Create automaton for condition
-            var moves = new Move<BvSet>[] { 
-                new Move<BvSet>(0, 0, posIs0),
-                new Move<BvSet>(0, 1, posIs1), 
-                new Move<BvSet>(1, 1, posIs0)
+            var moves = new Move<BDD>[] { 
+                new Move<BDD>(0, 0, posIs0),
+                new Move<BDD>(0, 1, posIs1), 
+                new Move<BDD>(1, 1, posIs0)
             };
 
             //Generate the dfa correpsonding to regexp
-            var dfa = Automaton<BvSet>.Create(0, new int[] { 1 }, moves);
+            var dfa = Automaton<BDD>.Create(0, new int[] { 1 }, moves);
             if(hashing)
                 dic[hash] = dfa;
             return dfa;
         }
 
-        internal override Automaton<BvSet> getDFA(List<string> variables, BvSet alphabet, CharSetSolver solver)
+        internal override Automaton<BDD> getDFA(List<string> variables, BDD alphabet, CharSetSolver solver)
         {
             return WS1SSingleton.computeDFA(variables, alphabet, solver, this.set);
         }
@@ -557,35 +550,35 @@ namespace MSOZ3
     public class WS1SUnaryPred : WS1SFormula
     {        
         internal string set;
-        internal BvSet pred;
+        internal BDD pred;
 
-        public WS1SUnaryPred(string set, BvSet pred)
+        public WS1SUnaryPred(string set, BDD pred)
         {
             this.set = set;
             this.pred = pred;
         }
 
-        internal static Automaton<BvSet> computeDFA(List<string> variables, BvSet alphabet, CharSetSolver solver, string set, BvSet pred)
+        internal static Automaton<BDD> computeDFA(List<string> variables, BDD alphabet, CharSetSolver solver, string set, BDD pred)
         {
             int setbit = variables.IndexOf(set);
 
             //Compute predicates for pos-th bit is 0 or 1
             var trueBv = solver.MkSetFromRange(0, (uint)(Math.Pow(2, variables.Count + 16) - 1), variables.Count + 16 - 1);
-            var posIs1 = solver.MkAnd(new BvSet[] { trueBv, solver.MkSetWithBitTrue(setbit), solver.ShiftLeft(pred, variables.Count) });
+            var posIs1 = solver.MkAnd(new BDD[] { trueBv, solver.MkSetWithBitTrue(setbit), solver.ShiftLeft(pred, variables.Count) });
             var posIs0 = solver.MkAnd(trueBv, solver.MkSetWithBitFalse(setbit));
 
             //Create automaton for condition
-            var moves = new Move<BvSet>[] { 
-                new Move<BvSet>(0, 0, posIs0),
-                new Move<BvSet>(0, 0, posIs1)
+            var moves = new Move<BDD>[] { 
+                new Move<BDD>(0, 0, posIs0),
+                new Move<BDD>(0, 0, posIs1)
             };
 
-            var dfa = Automaton<BvSet>.Create(0, new int[] { 0 }, moves);
+            var dfa = Automaton<BDD>.Create(0, new int[] { 0 }, moves);
             return dfa;
         }
 
 
-        internal override Automaton<BvSet> getDFA(List<string> variables, BvSet alphabet, CharSetSolver solver)
+        internal override Automaton<BDD> getDFA(List<string> variables, BDD alphabet, CharSetSolver solver)
         {
             return computeDFA(variables, alphabet, solver, set, pred);
         }
@@ -602,7 +595,7 @@ namespace MSOZ3
 
     public class WS1SSuccN : WS1SFormula
     {
-        private static Dictionary<BvSet, Dictionary<int, Dictionary<Pair<int, Pair<int, int>>, Automaton<BvSet>>>> hashedDfa = new Dictionary<BvSet, Dictionary<int, Dictionary<Pair<int, Pair<int, int>>, Automaton<BvSet>>>>();
+        private static Dictionary<BDD, Dictionary<int, Dictionary<Pair<int, Pair<int, int>>, Automaton<BDD>>>> hashedDfa = new Dictionary<BDD, Dictionary<int, Dictionary<Pair<int, Pair<int, int>>, Automaton<BDD>>>>();
         private static bool hashing = false;
 
         internal string set1;
@@ -616,20 +609,20 @@ namespace MSOZ3
             this.n = n;
         }
 
-        internal static Automaton<BvSet> computeDFA(List<string> variables, BvSet alphabet, CharSetSolver solver, string set1, string set2, int n)
+        internal static Automaton<BDD> computeDFA(List<string> variables, BDD alphabet, CharSetSolver solver, string set1, string set2, int n)
         {
             int pos1 = variables.IndexOf(set1);
             int pos2 = variables.IndexOf(set2);
 
-            Dictionary<int, Dictionary<Pair<int, Pair<int, int>>, Automaton<BvSet>>> dic1;
+            Dictionary<int, Dictionary<Pair<int, Pair<int, int>>, Automaton<BDD>>> dic1;
             if (!hashedDfa.ContainsKey(alphabet))
-                hashedDfa[alphabet] = new Dictionary<int, Dictionary<Pair<int, Pair<int, int>>, Automaton<BvSet>>>();
+                hashedDfa[alphabet] = new Dictionary<int, Dictionary<Pair<int, Pair<int, int>>, Automaton<BDD>>>();
 
             dic1 = hashedDfa[alphabet];
 
-            Dictionary<Pair<int, Pair<int, int>>, Automaton<BvSet>> dic2;
+            Dictionary<Pair<int, Pair<int, int>>, Automaton<BDD>> dic2;
             if (!dic1.ContainsKey(variables.Count))
-                dic1[variables.Count] = new Dictionary<Pair<int, Pair<int, int>>, Automaton<BvSet>>();
+                dic1[variables.Count] = new Dictionary<Pair<int, Pair<int, int>>, Automaton<BDD>>();
 
             dic2 = dic1[variables.Count];
 
@@ -643,27 +636,27 @@ namespace MSOZ3
             var pos2is0 = solver.MkAnd(trueBv, solver.MkSetWithBitFalse(pos2));
             var pos2is1 = solver.MkAnd(trueBv, solver.MkSetWithBitTrue(pos2));
 
-            var both0 = solver.MkAnd(new BvSet[] { pos1is0, pos2is0 });
-            var pos11pos20 = solver.MkAnd(new BvSet[] { pos1is1, pos2is0 });
-            var pos10pos21 = solver.MkAnd(new BvSet[] { pos1is0, pos2is1 });
+            var both0 = solver.MkAnd(new BDD[] { pos1is0, pos2is0 });
+            var pos11pos20 = solver.MkAnd(new BDD[] { pos1is1, pos2is0 });
+            var pos10pos21 = solver.MkAnd(new BDD[] { pos1is0, pos2is1 });
 
             //Create automaton for condition
-            var moves = new List<Move<BvSet>>();
-            moves.Add(new Move<BvSet>(0, 0, both0));
-            moves.Add(new Move<BvSet>(0, 1, pos11pos20));
+            var moves = new List<Move<BDD>>();
+            moves.Add(new Move<BDD>(0, 0, both0));
+            moves.Add(new Move<BDD>(0, 1, pos11pos20));
             for(int i = 1;i<n;i++){
-                moves.Add(new Move<BvSet>(i, i+1, both0));
+                moves.Add(new Move<BDD>(i, i+1, both0));
             }
-            moves.Add(new Move<BvSet>(n, n+1, pos10pos21)); 
-            moves.Add(new Move<BvSet>(n+1, n+1, both0));
+            moves.Add(new Move<BDD>(n, n+1, pos10pos21)); 
+            moves.Add(new Move<BDD>(n+1, n+1, both0));
 
-            var dfa = Automaton<BvSet>.Create(0, new int[] { n+1 }, moves).Determinize(solver).Minimize(solver);
+            var dfa = Automaton<BDD>.Create(0, new int[] { n+1 }, moves).Determinize(solver).Minimize(solver);
             if(hashing)
                 dic2[hash] = dfa;
             return dfa;
         }
 
-        internal override Automaton<BvSet> getDFA(List<string> variables, BvSet alphabet, CharSetSolver solver)
+        internal override Automaton<BDD> getDFA(List<string> variables, BDD alphabet, CharSetSolver solver)
         {
             //Build DFA corresponding to regexp
             return computeDFA(variables, alphabet, solver, set1, set2, n);
@@ -684,25 +677,25 @@ namespace MSOZ3
 
     public class WS1SSucc : WS1SSuccN
     {
-        //private static Dictionary<BvSet, Dictionary<int, Dictionary<Pair<int, int>, Automaton<BvSet>>>> hashedDfa = new Dictionary<BvSet, Dictionary<int, Dictionary<Pair<int, int>, Automaton<BvSet>>>>();
+        //private static Dictionary<BDD, Dictionary<int, Dictionary<Pair<int, int>, Automaton<BDD>>>> hashedDfa = new Dictionary<BDD, Dictionary<int, Dictionary<Pair<int, int>, Automaton<BDD>>>>();
         //private static bool hashing = false;
 
         public WS1SSucc(string set1, string set2): base(set1,set2,1){}
 
-        //internal static Automaton<BvSet> computeDFA(List<string> variables, BvSet alphabet, CharSetSolver solver, string set1, string set2)
+        //internal static Automaton<BDD> computeDFA(List<string> variables, BDD alphabet, CharSetSolver solver, string set1, string set2)
         //{
         //    int pos1 = variables.IndexOf(set1);
         //    int pos2 = variables.IndexOf(set2);
 
-        //    Dictionary<int, Dictionary<Pair<int, int>, Automaton<BvSet>>> dic1;
+        //    Dictionary<int, Dictionary<Pair<int, int>, Automaton<BDD>>> dic1;
         //    if (!hashedDfa.ContainsKey(alphabet))
-        //        hashedDfa[alphabet] = new Dictionary<int, Dictionary<Pair<int, int>, Automaton<BvSet>>>();
+        //        hashedDfa[alphabet] = new Dictionary<int, Dictionary<Pair<int, int>, Automaton<BDD>>>();
 
         //    dic1 = hashedDfa[alphabet];
 
-        //    Dictionary<Pair<int, int>, Automaton<BvSet>> dic2;
+        //    Dictionary<Pair<int, int>, Automaton<BDD>> dic2;
         //    if (!dic1.ContainsKey(variables.Count))
-        //        dic1[variables.Count] = new Dictionary<Pair<int, int>, Automaton<BvSet>>();
+        //        dic1[variables.Count] = new Dictionary<Pair<int, int>, Automaton<BDD>>();
 
         //    dic2 = dic1[variables.Count];
 
@@ -716,25 +709,25 @@ namespace MSOZ3
         //    var pos2is0 = solver.MkAnd(trueBv, solver.MkSetWithBitFalse(pos2));
         //    var pos2is1 = solver.MkAnd(trueBv, solver.MkSetWithBitTrue(pos2));
 
-        //    var both0 = solver.MkAnd(new BvSet[] { pos1is0, pos2is0 });
-        //    var pos11pos20 = solver.MkAnd(new BvSet[] { pos1is1, pos2is0 });
-        //    var pos10pos21 = solver.MkAnd(new BvSet[] { pos1is0, pos2is1 });
+        //    var both0 = solver.MkAnd(new BDD[] { pos1is0, pos2is0 });
+        //    var pos11pos20 = solver.MkAnd(new BDD[] { pos1is1, pos2is0 });
+        //    var pos10pos21 = solver.MkAnd(new BDD[] { pos1is0, pos2is1 });
 
         //    //Create automaton for condition
-        //    var moves = new Move<BvSet>[] { 
-        //        new Move<BvSet>(0, 0, both0),
-        //        new Move<BvSet>(0, 1, pos11pos20), 
-        //        new Move<BvSet>(1, 2, pos10pos21), 
-        //        new Move<BvSet>(2, 2, both0), 
+        //    var moves = new Move<BDD>[] { 
+        //        new Move<BDD>(0, 0, both0),
+        //        new Move<BDD>(0, 1, pos11pos20), 
+        //        new Move<BDD>(1, 2, pos10pos21), 
+        //        new Move<BDD>(2, 2, both0), 
         //    };
 
-        //    var dfa = Automaton<BvSet>.Create(0, new int[] { 2 }, moves).Determinize(solver).Minimize(solver);
+        //    var dfa = Automaton<BDD>.Create(0, new int[] { 2 }, moves).Determinize(solver).Minimize(solver);
         //    if(has
         //    dic2[hash] = dfa;
         //    return dfa;
         //}
 
-        //internal override Automaton<BvSet> getDFA(List<string> variables, BvSet alphabet, CharSetSolver solver)
+        //internal override Automaton<BDD> getDFA(List<string> variables, BDD alphabet, CharSetSolver solver)
         //{
         //    //Build DFA corresponding to regexp
         //    return computeDFA(variables, alphabet, solver, set1, set2, );
@@ -755,7 +748,7 @@ namespace MSOZ3
 
     public class WS1SLess : WS1SFormula
     {
-        private static Dictionary<BvSet, Dictionary<int, Dictionary<Pair<int, int>, Automaton<BvSet>>>> hashedDfa = new Dictionary<BvSet, Dictionary<int, Dictionary<Pair<int, int>, Automaton<BvSet>>>>();
+        private static Dictionary<BDD, Dictionary<int, Dictionary<Pair<int, int>, Automaton<BDD>>>> hashedDfa = new Dictionary<BDD, Dictionary<int, Dictionary<Pair<int, int>, Automaton<BDD>>>>();
         private static bool hashing = false;
 
         string set1;
@@ -767,20 +760,20 @@ namespace MSOZ3
             this.set2 = set2;
         }
 
-        internal static Automaton<BvSet> computeDFA(List<string> variables, BvSet alphabet, CharSetSolver solver, string set1, string set2)
+        internal static Automaton<BDD> computeDFA(List<string> variables, BDD alphabet, CharSetSolver solver, string set1, string set2)
         {
             int pos1 = variables.IndexOf(set1);
             int pos2 = variables.IndexOf(set2);
 
-            Dictionary<int, Dictionary<Pair<int, int>, Automaton<BvSet>>> dic1;
+            Dictionary<int, Dictionary<Pair<int, int>, Automaton<BDD>>> dic1;
             if (!hashedDfa.ContainsKey(alphabet))
-                hashedDfa[alphabet] = new Dictionary<int, Dictionary<Pair<int, int>, Automaton<BvSet>>>();
+                hashedDfa[alphabet] = new Dictionary<int, Dictionary<Pair<int, int>, Automaton<BDD>>>();
 
             dic1 = hashedDfa[alphabet];
 
-            Dictionary<Pair<int, int>, Automaton<BvSet>> dic2;
+            Dictionary<Pair<int, int>, Automaton<BDD>> dic2;
             if (!dic1.ContainsKey(variables.Count))
-                dic1[variables.Count] = new Dictionary<Pair<int, int>, Automaton<BvSet>>();
+                dic1[variables.Count] = new Dictionary<Pair<int, int>, Automaton<BDD>>();
 
             dic2 = dic1[variables.Count];
 
@@ -800,20 +793,20 @@ namespace MSOZ3
             var pos10pos21 = solver.MkAnd(pos1is0, pos2is1);
 
             //Create automaton for condition
-            var moves = new Move<BvSet>[] { 
-                new Move<BvSet>(0, 0, both0),
-                new Move<BvSet>(0, 1, pos11pos20), 
-                new Move<BvSet>(1, 1, both0),
-                new Move<BvSet>(1, 2, pos10pos21), 
-                new Move<BvSet>(2, 2, both0), 
+            var moves = new Move<BDD>[] { 
+                new Move<BDD>(0, 0, both0),
+                new Move<BDD>(0, 1, pos11pos20), 
+                new Move<BDD>(1, 1, both0),
+                new Move<BDD>(1, 2, pos10pos21), 
+                new Move<BDD>(2, 2, both0), 
             };
-            var dfa = Automaton<BvSet>.Create(0, new int[] { 2 }, moves).Determinize(solver).Minimize(solver);
+            var dfa = Automaton<BDD>.Create(0, new int[] { 2 }, moves).Determinize(solver).Minimize(solver);
             if(hashing)
                 dic2[hash] = dfa;
             return dfa;
         }
 
-        internal override Automaton<BvSet> getDFA(List<string> variables, BvSet alphabet, CharSetSolver solver)
+        internal override Automaton<BDD> getDFA(List<string> variables, BDD alphabet, CharSetSolver solver)
         {
             //Build DFA corresponding to regexp
             return computeDFA(variables, alphabet, solver, set1, set2);
@@ -834,7 +827,7 @@ namespace MSOZ3
 
     public class WS1SLessOrEqual : WS1SFormula
     {
-        private static Dictionary<BvSet, Dictionary<int, Dictionary<Pair<int, int>, Automaton<BvSet>>>> hashedDfa = new Dictionary<BvSet, Dictionary<int, Dictionary<Pair<int, int>, Automaton<BvSet>>>>();
+        private static Dictionary<BDD, Dictionary<int, Dictionary<Pair<int, int>, Automaton<BDD>>>> hashedDfa = new Dictionary<BDD, Dictionary<int, Dictionary<Pair<int, int>, Automaton<BDD>>>>();
         private static bool hashing = false;
 
         string set1;
@@ -846,20 +839,20 @@ namespace MSOZ3
             this.set2 = set2;
         }
 
-        internal static Automaton<BvSet> computeDFA(List<string> variables, BvSet alphabet, CharSetSolver solver, string set1, string set2)
+        internal static Automaton<BDD> computeDFA(List<string> variables, BDD alphabet, CharSetSolver solver, string set1, string set2)
         {
             int pos1 = variables.IndexOf(set1);
             int pos2 = variables.IndexOf(set2);
 
-            Dictionary<int, Dictionary<Pair<int, int>, Automaton<BvSet>>> dic1;
+            Dictionary<int, Dictionary<Pair<int, int>, Automaton<BDD>>> dic1;
             if (!hashedDfa.ContainsKey(alphabet))
-                hashedDfa[alphabet] = new Dictionary<int, Dictionary<Pair<int, int>, Automaton<BvSet>>>();
+                hashedDfa[alphabet] = new Dictionary<int, Dictionary<Pair<int, int>, Automaton<BDD>>>();
 
             dic1 = hashedDfa[alphabet];
 
-            Dictionary<Pair<int, int>, Automaton<BvSet>> dic2;
+            Dictionary<Pair<int, int>, Automaton<BDD>> dic2;
             if (!dic1.ContainsKey(variables.Count))
-                dic1[variables.Count] = new Dictionary<Pair<int, int>, Automaton<BvSet>>();
+                dic1[variables.Count] = new Dictionary<Pair<int, int>, Automaton<BDD>>();
 
             dic2 = dic1[variables.Count];
 
@@ -880,21 +873,21 @@ namespace MSOZ3
             var pos10pos21 = solver.MkAnd(pos1is0, pos2is1);
 
             //Create automaton for condition
-            var moves = new Move<BvSet>[] { 
-                new Move<BvSet>(0, 0, both0),
-                new Move<BvSet>(0, 2, both1),
-                new Move<BvSet>(0, 1, pos11pos20), 
-                new Move<BvSet>(1, 1, both0),
-                new Move<BvSet>(1, 2, pos10pos21), 
-                new Move<BvSet>(2, 2, both0), 
+            var moves = new Move<BDD>[] { 
+                new Move<BDD>(0, 0, both0),
+                new Move<BDD>(0, 2, both1),
+                new Move<BDD>(0, 1, pos11pos20), 
+                new Move<BDD>(1, 1, both0),
+                new Move<BDD>(1, 2, pos10pos21), 
+                new Move<BDD>(2, 2, both0), 
             };
-            var dfa = Automaton<BvSet>.Create(0, new int[] { 2 }, moves).Determinize(solver).Minimize(solver);
+            var dfa = Automaton<BDD>.Create(0, new int[] { 2 }, moves).Determinize(solver).Minimize(solver);
             if(hashing)
                 dic2[hash] = dfa;
             return dfa;
         }
 
-        internal override Automaton<BvSet> getDFA(List<string> variables, BvSet alphabet, CharSetSolver solver)
+        internal override Automaton<BDD> getDFA(List<string> variables, BDD alphabet, CharSetSolver solver)
         {
             //Build DFA corresponding to regexp
             return computeDFA(variables, alphabet, solver, set1, set2);
@@ -915,7 +908,7 @@ namespace MSOZ3
 
     public class WS1SEqual : WS1SFormula
     {
-        private static Dictionary<BvSet, Dictionary<int, Dictionary<Pair<int, int>, Automaton<BvSet>>>> hashedDfa = new Dictionary<BvSet, Dictionary<int, Dictionary<Pair<int, int>, Automaton<BvSet>>>>();
+        private static Dictionary<BDD, Dictionary<int, Dictionary<Pair<int, int>, Automaton<BDD>>>> hashedDfa = new Dictionary<BDD, Dictionary<int, Dictionary<Pair<int, int>, Automaton<BDD>>>>();
         private static bool hashing = false;
 
         string set1, set2;
@@ -926,20 +919,20 @@ namespace MSOZ3
             this.set2 = set2;
         }
 
-        internal static Automaton<BvSet> computeDFA(List<string> variables, BvSet alphabet, CharSetSolver solver, string set1, string set2)
+        internal static Automaton<BDD> computeDFA(List<string> variables, BDD alphabet, CharSetSolver solver, string set1, string set2)
         {
             int pos1 = variables.IndexOf(set1);
             int pos2 = variables.IndexOf(set2);
 
-            Dictionary<int, Dictionary<Pair<int, int>, Automaton<BvSet>>> dic1;
+            Dictionary<int, Dictionary<Pair<int, int>, Automaton<BDD>>> dic1;
             if (!hashedDfa.ContainsKey(alphabet))
-                hashedDfa[alphabet] = new Dictionary<int, Dictionary<Pair<int, int>, Automaton<BvSet>>>();
+                hashedDfa[alphabet] = new Dictionary<int, Dictionary<Pair<int, int>, Automaton<BDD>>>();
 
             dic1 = hashedDfa[alphabet];
 
-            Dictionary<Pair<int, int>, Automaton<BvSet>> dic2;
+            Dictionary<Pair<int, int>, Automaton<BDD>> dic2;
             if (!dic1.ContainsKey(variables.Count))
-                dic1[variables.Count] = new Dictionary<Pair<int, int>, Automaton<BvSet>>();
+                dic1[variables.Count] = new Dictionary<Pair<int, int>, Automaton<BDD>>();
 
             dic2 = dic1[variables.Count];
 
@@ -949,19 +942,19 @@ namespace MSOZ3
 
             //Create conditions that bit in pos1 is smaller than pos2
             var trueBv = solver.MkSetFromRange(0, (uint)(Math.Pow(2, variables.Count + 16) - 1), variables.Count + 16 - 1);
-            var both1 = solver.MkAnd(new BvSet[] { trueBv, solver.MkSetWithBitTrue(pos1), solver.MkSetWithBitTrue(pos2) });
-            var both0 = solver.MkAnd(new BvSet[] { trueBv, solver.MkSetWithBitFalse(pos1), solver.MkSetWithBitFalse(pos2) });
-            var eqCond = solver.MkOr(new BvSet[] { both0, both1 });
+            var both1 = solver.MkAnd(new BDD[] { trueBv, solver.MkSetWithBitTrue(pos1), solver.MkSetWithBitTrue(pos2) });
+            var both0 = solver.MkAnd(new BDD[] { trueBv, solver.MkSetWithBitFalse(pos1), solver.MkSetWithBitFalse(pos2) });
+            var eqCond = solver.MkOr(new BDD[] { both0, both1 });
 
             //Create automaton for condition
-            var moves = new Move<BvSet>[] { new Move<BvSet>(0, 0, eqCond) };
-            var dfa = Automaton<BvSet>.Create(0, new int[] { 0 }, moves).Determinize(solver).Minimize(solver);
+            var moves = new Move<BDD>[] { new Move<BDD>(0, 0, eqCond) };
+            var dfa = Automaton<BDD>.Create(0, new int[] { 0 }, moves).Determinize(solver).Minimize(solver);
             if(hashing)
                 dic2[hash] = dfa;
             return dfa;
         }
 
-        internal override Automaton<BvSet> getDFA(List<string> variables, BvSet alphabet, CharSetSolver solver)
+        internal override Automaton<BDD> getDFA(List<string> variables, BDD alphabet, CharSetSolver solver)
         {
             //Build DFA corresponding to regexp
             return computeDFA(variables, alphabet, solver, set1, set2);

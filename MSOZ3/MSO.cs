@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 
 using Microsoft.Automata;
-using Microsoft.Automata.Z3;
-using Microsoft.Z3;
 
 
 namespace MSOZ3
@@ -50,12 +48,12 @@ namespace MSOZ3
 
         internal abstract bool CheckUseOfVars(List<string> fovar, List<string> sovar);
 
-        public Automaton<BvSet> getDFA(HashSet<char> alphabet, CharSetSolver solver)
+        public Automaton<BDD> getDFA(HashSet<char> alphabet, CharSetSolver solver)
         {            
             return this.ToWS1S(solver).getDFA(alphabet, solver);
         }
 
-        public Automaton<BvSet> getDFA(BvSet alphabet, CharSetSolver solver)
+        public Automaton<BDD> getDFA(BDD alphabet, CharSetSolver solver)
         {
             return this.ToWS1S(solver).getDFA(alphabet, solver);
         }
@@ -559,9 +557,9 @@ namespace MSOZ3
     public class MSOUnaryPred : MSOFormula
     {
         internal string set;
-        internal BvSet pred;
+        internal BDD pred;
 
-        public MSOUnaryPred(string set, BvSet pred)
+        public MSOUnaryPred(string set, BDD pred)
         {
             this.set = set;
             this.pred = pred;            

@@ -31,21 +31,21 @@ namespace MSOZ3Test
 
             var a = solver.MkCharConstraint(false, 'a');
             var b = solver.MkCharConstraint(false, 'b');
-            var moves = new List<Move<BvSet>>();
+            var moves = new List<Move<BDD>>();
 
-            moves.Add(new Move<BvSet>(0, 1, a));
-            moves.Add(new Move<BvSet>(0, 3, b));
-            moves.Add(new Move<BvSet>(1,2, b));
-            moves.Add(new Move<BvSet>(2, 1, a));
-            moves.Add(new Move<BvSet>(1, 1, a));
-            moves.Add(new Move<BvSet>(2, 2, b));
+            moves.Add(new Move<BDD>(0, 1, a));
+            moves.Add(new Move<BDD>(0, 3, b));
+            moves.Add(new Move<BDD>(1,2, b));
+            moves.Add(new Move<BDD>(2, 1, a));
+            moves.Add(new Move<BDD>(1, 1, a));
+            moves.Add(new Move<BDD>(2, 2, b));
 
-            moves.Add(new Move<BvSet>(3, 4, a));
-            moves.Add(new Move<BvSet>(4, 3, b));
-            moves.Add(new Move<BvSet>(3, 3, b));
-            moves.Add(new Move<BvSet>(4, 4, a));
+            moves.Add(new Move<BDD>(3, 4, a));
+            moves.Add(new Move<BDD>(4, 3, b));
+            moves.Add(new Move<BDD>(3, 3, b));
+            moves.Add(new Move<BDD>(4, 4, a));
 
-            var dfa1 = Automaton<BvSet>.Create(0, new int[] { 0,1,3 }, moves).Determinize(solver).Minimize(solver);
+            var dfa1 = Automaton<BDD>.Create(0, new int[] { 0,1,3 }, moves).Determinize(solver).Minimize(solver);
             foreach (var v in pdlEnumerator.SynthesizePDL(al, dfa1, solver, new StringBuilder(), 5000))
             {
                 Console.WriteLine(PDLUtil.ToEnglishString(v));
@@ -334,7 +334,7 @@ namespace MSOZ3Test
 
 
         #region ACCESSORIES METHODS
-        private static void PrintDFA(Automaton<BvSet> dfa, string name, HashSet<char> al)
+        private static void PrintDFA(Automaton<BDD> dfa, string name, HashSet<char> al)
         {
             var sb = new StringBuilder();
             DFAUtilities.printDFA(dfa, al, sb);
@@ -344,7 +344,7 @@ namespace MSOZ3Test
             file.Close();
         }
 
-        private static Pair<HashSet<char>, Automaton<BvSet>> ReadDFA(string name, CharSetSolver solver)
+        private static Pair<HashSet<char>, Automaton<BDD>> ReadDFA(string name, CharSetSolver solver)
         {
             System.IO.StreamReader file = new System.IO.StreamReader(@"../../../TestPDL/DFAs/" + name + ".txt");
             string res = file.ReadToEnd();

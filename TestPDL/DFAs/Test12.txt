@@ -3,12 +3,12 @@ alphabet: a b
 final states: 4 5
 0,1,a
 0,0,b
-1,1,a
 1,2,b
+1,1,a
 2,3,a
 2,2,b
-3,3,a
 3,4,b
+3,3,a
 4,5,a
 4,4,b
 5,5,a

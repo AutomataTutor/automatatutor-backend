@@ -48,7 +48,7 @@ namespace AutomataPDL
         Stopwatch timer; 
         #endregion
 
-        public void InitializeSearchParameters(HashSet<char> alphabet, Automaton<BvSet> dfa, CharSetSolver solver)
+        public void InitializeSearchParameters(HashSet<char> alphabet, Automaton<BDD> dfa, CharSetSolver solver)
         {
             numStates = dfa.StateCount;
             alph = alphabet;
@@ -129,7 +129,7 @@ namespace AutomataPDL
             #endregion
         }
 
-        public IEnumerable<PDLPred> SynthesizePDL(HashSet<char> alphabet, Automaton<BvSet> dfa, CharSetSolver solver, StringBuilder sb, long timeout, int maxFormulas=1)
+        public IEnumerable<PDLPred> SynthesizePDL(HashSet<char> alphabet, Automaton<BDD> dfa, CharSetSolver solver, StringBuilder sb, long timeout, int maxFormulas=1)
         {
             #region test variables
             int enumeratedPhis = 0;
@@ -397,7 +397,7 @@ namespace AutomataPDL
         }
         
 
-        public IEnumerable<Pair<PDLPred,double>> SynthesizeUnderapproximationPDL(HashSet<char> alphabet, Automaton<BvSet> dfa, CharSetSolver solver, StringBuilder sb, long timeout)
+        public IEnumerable<Pair<PDLPred,double>> SynthesizeUnderapproximationPDL(HashSet<char> alphabet, Automaton<BDD> dfa, CharSetSolver solver, StringBuilder sb, long timeout)
         {
             #region TestSets for equiv
             var mytests = DFAUtilities.MyHillTestGeneration(alphabet, dfa, solver);

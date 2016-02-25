@@ -35,9 +35,9 @@ namespace TestPDL
 
             Assert.IsTrue(dfa.IsEquivalentWith(test, solver));
 
-            string file = "../../../TestPDL/DotFiles/exists";
+            ////string file = "../../../TestPDL/DotFiles/exists";
 
-            solver.SaveAsDot(dfa, "aut", file);
+            ////solver.SaveAsDot(dfa, "aut", file);
 
         }
 
@@ -64,9 +64,9 @@ namespace TestPDL
 
             Assert.IsTrue(dfa.IsEquivalentWith(test, solver));
 
-            string file = "../../../TestPDL/DotFiles/IntEq2";
+            ////string file = "../../../TestPDL/DotFiles/IntEq2";
 
-            solver.SaveAsDot(dfa, "aut", file);
+            //solver.SaveAsDot(dfa, "aut", file);
 
         }
 
@@ -87,9 +87,9 @@ namespace TestPDL
 
             Assert.IsTrue(dfa.IsEquivalentWith(test, solver));
 
-            string file = "../../../TestPDL/DotFiles/FirstLast";
+            //string file = "../../../TestPDL/DotFiles/FirstLast";
 
-            solver.SaveAsDot(dfa, "aut", file);
+            //solver.SaveAsDot(dfa, "aut", file);
 
         }
 
@@ -111,9 +111,9 @@ namespace TestPDL
 
             Assert.IsTrue(dfa.IsEquivalentWith(test, solver));
 
-            string file = "../../../TestPDL/DotFiles/FirstLastEq";
+            //string file = "../../../TestPDL/DotFiles/FirstLastEq";
 
-            solver.SaveAsDot(dfa, "aut", file);
+            //solver.SaveAsDot(dfa, "aut", file);
 
         }
 
@@ -146,10 +146,10 @@ namespace TestPDL
 
             var dfa = phi.getDFA(al, solver);
 
-            string file = "../../../TestPDL/DotFiles/check";
+            //string file = "../../../TestPDL/DotFiles/check";
             System.Console.WriteLine("x" + 1.ToString());
 
-            solver.SaveAsDot(dfa, "aut", file);
+            //solver.SaveAsDot(dfa, "aut", file);
 
         }
 
@@ -179,9 +179,9 @@ namespace TestPDL
 
             Assert.IsTrue(dfa.IsEquivalentWith(test, solver));
 
-            string file = "../../../TestPDL/DotFiles/succ1";
+            //string file = "../../../TestPDL/DotFiles/succ1";
 
-            solver.SaveAsDot(dfa, "aut", file);
+            //solver.SaveAsDot(dfa, "aut", file);
         }
 
         [TestMethod]
@@ -206,9 +206,9 @@ namespace TestPDL
 
             var dfa = phi.GetDFA(al, solver);
 
-            string file = "../../../TestPDL/DotFiles/succ2";
+            //string file = "../../../TestPDL/DotFiles/succ2";
 
-            solver.SaveAsDot(dfa, "aut", file);
+            //solver.SaveAsDot(dfa, "aut", file);
         }
 
         [TestMethod]
@@ -234,9 +234,9 @@ namespace TestPDL
 
             //var dfa = phi.GetDFA(al, solver);
 
-            //string file = "../../../TestPDL/DotFiles/succ2";
+            ////string file = "../../../TestPDL/DotFiles/succ2";
 
-            //solver.SaveAsDot(dfa, "aut", file);
+            ////solver.SaveAsDot(dfa, "aut", file);
         }
 
         [TestMethod]
@@ -259,12 +259,12 @@ namespace TestPDL
 
             var test = solver.Convert(@"^((b*ab*){5})*(b*ab*){3}$").Determinize(solver).Minimize(solver);
 
-            string file = "../../../TestPDL/DotFiles/mod5";
+            //string file = "../../../TestPDL/DotFiles/mod5";
 
-            solver.SaveAsDot(dfa, "aut", file);
+            //solver.SaveAsDot(dfa, "aut", file);
 
 
-            solver.SaveAsDot(test, "aut", file+"t");
+            //solver.SaveAsDot(test, "aut", file+"t");
 
             Assert.IsTrue(dfa.IsEquivalentWith(test, solver));            
 
@@ -302,9 +302,9 @@ namespace TestPDL
 
             var test = solver.Convert(@"^((a|b){5})*(a|b){1}$");
 
-            string file = "../../../TestPDL/DotFiles/mod5";
+            //string file = "../../../TestPDL/DotFiles/mod5";
 
-            solver.SaveAsDot(dfa, "aut", file);
+            //solver.SaveAsDot(dfa, "aut", file);
 
 
             Console.Write(phi.ToMSO().ToString());
@@ -341,10 +341,10 @@ namespace TestPDL
 
             var test = solver.Convert(@"^((a|b){6})*(a|b){3}$").Determinize(solver).Minimize(solver);
 
-            string file = "../../../TestPDL/DotFiles/mod6";
+            //string file = "../../../TestPDL/DotFiles/mod6";
 
-            solver.SaveAsDot(dfa, "aut", file);
-            solver.SaveAsDot(test, "aut", file+"t");
+            //solver.SaveAsDot(dfa, "aut", file);
+            // solver.SaveAsDot(test, "aut", file+"t");
 
 
             Console.Write(phi.ToMSO().ToString());
@@ -373,9 +373,9 @@ namespace TestPDL
 
             Assert.IsTrue(dfa.IsEquivalentWith(test, solver));
 
-            string file = "../../../TestPDL/DotFiles/OddA";
+            //string file = "../../../TestPDL/DotFiles/OddA";
 
-            solver.SaveAsDot(dfa, "aut", file);
+            //solver.SaveAsDot(dfa, "aut", file);
         }
 
         [TestMethod]
@@ -400,9 +400,9 @@ namespace TestPDL
 
             Assert.IsTrue(dfa.IsEquivalentWith(test, solver));
 
-            string file = "../../../TestPDL/DotFiles/SameFirstLast";
+            //string file = "../../../TestPDL/DotFiles/SameFirstLast";
 
-            solver.SaveAsDot(dfa, "aut", file);
+            //solver.SaveAsDot(dfa, "aut", file);
         }
 
         [TestMethod]
@@ -424,9 +424,9 @@ namespace TestPDL
 
             var test = solver.Convert(@"^b*a+b+a+b+a*$");
 
-            string file = "../../../TestPDL/DotFiles/abTwice";
+            //string file = "../../../TestPDL/DotFiles/abTwice";
 
-            solver.SaveAsDot(dfa, "aut", file);
+            //solver.SaveAsDot(dfa, "aut", file);
 
             Assert.IsTrue(dfa.IsEquivalentWith(test, solver));
         }
@@ -450,9 +450,9 @@ namespace TestPDL
 
             var test = solver.Convert(@"^[a-c]*abc[a-c]*$");
 
-            string file = "../../../TestPDL/DotFiles/abcSubStr";
+            //string file = "../../../TestPDL/DotFiles/abcSubStr";
 
-            solver.SaveAsDot(dfa, "aut", file);
+            //solver.SaveAsDot(dfa, "aut", file);
 
             Assert.IsTrue(dfa.IsEquivalentWith(test, solver));
         }
@@ -476,9 +476,9 @@ namespace TestPDL
 
             var test = solver.Convert(@"^(((a|b){2})*|((a|b){3})*)$");
 
-            string file = "../../../TestPDL/DotFiles/div2or3";
+            //string file = "../../../TestPDL/DotFiles/div2or3";
 
-            solver.SaveAsDot(dfa, "aut", file);
+            //solver.SaveAsDot(dfa, "aut", file);
 
             Assert.IsTrue(dfa.IsEquivalentWith(test, solver));
         }
@@ -507,9 +507,9 @@ namespace TestPDL
 
             var test = solver.Convert(@"^(((a|b)*aa(a|b)*ab)|(a|b)*aab)$");
 
-            string file = "../../../TestPDL/DotFiles/contains_aa_end_ab";
+            //string file = "../../../TestPDL/DotFiles/contains_aa_end_ab";
 
-            solver.SaveAsDot(dfa, "aut", file);
+            //solver.SaveAsDot(dfa, "aut", file);
 
             Assert.IsTrue(dfa.IsEquivalentWith(test, solver));
         }
@@ -539,9 +539,9 @@ namespace TestPDL
 
             var test = solver.Convert(@"^(a|b)*aa(((a|b)*(aa|ba|bb))|(a*))$");
 
-            string file = "../../../TestPDL/DotFiles/contains_aa_notend_ab";
+            //string file = "../../../TestPDL/DotFiles/contains_aa_notend_ab";
 
-            solver.SaveAsDot(dfa, "aut", file);
+            //solver.SaveAsDot(dfa, "aut", file);
 
             Assert.IsTrue(dfa.IsEquivalentWith(test, solver));
         }
@@ -565,9 +565,9 @@ namespace TestPDL
 
             var test = solver.Convert(@"^b*(ab+|aab+)*aaa(b+a|b+aa)*b*$");
 
-            string file = "../../../TestPDL/DotFiles/once_aaa";
+            //string file = "../../../TestPDL/DotFiles/once_aaa";
 
-            solver.SaveAsDot(dfa, "aut", file);
+            //solver.SaveAsDot(dfa, "aut", file);
 
             Assert.IsTrue(dfa.IsEquivalentWith(test, solver));
         }
@@ -592,9 +592,9 @@ namespace TestPDL
 
             var test = solver.Convert(@"^(aa+|baa+|aba+|aa+ba*)$");
 
-            string file = "../../../TestPDL/DotFiles/a2b1";
+            //string file = "../../../TestPDL/DotFiles/a2b1";
 
-            solver.SaveAsDot(dfa, "aut", file);
+            //solver.SaveAsDot(dfa, "aut", file);
 
             Assert.IsTrue(dfa.IsEquivalentWith(test, solver));
         }
@@ -624,10 +624,10 @@ namespace TestPDL
 
             var test = solver.Convert(@"^(b*|b*ab*|b*a(bb)*ab*)$").Determinize(solver).Minimize(solver);
 
-            string file = "../../../TestPDL/DotFiles/evenSpacingA";
+            //string file = "../../../TestPDL/DotFiles/evenSpacingA";
 
-            solver.SaveAsDot(dfa, "aut", file);
-            solver.SaveAsDot(test, "aut", file+"t");
+            //solver.SaveAsDot(dfa, "aut", file);
+            //solver.SaveAsDot(test, "aut", file+"t");
 
             Assert.IsTrue(dfa.IsEquivalentWith(test, solver));
         }
@@ -690,9 +690,9 @@ namespace TestPDL
 
             var test = solver.Convert(@"^abc[a-c]*$");
 
-            string file = "../../../TestPDL/DotFiles/StartsWithAbc";
+            //string file = "../../../TestPDL/DotFiles/StartsWithAbc";
 
-            solver.SaveAsDot(dfa, "aut", file);
+            //solver.SaveAsDot(dfa, "aut", file);
 
             Assert.IsTrue(dfa.IsEquivalentWith(test, solver));
 
@@ -717,9 +717,9 @@ namespace TestPDL
 
             var test = solver.Convert(@"^[a-c]*abc$");
 
-            string file = "../../../TestPDL/DotFiles/EndsWithAbc";
+            //string file = "../../../TestPDL/DotFiles/EndsWithAbc";
 
-            solver.SaveAsDot(dfa, "aut", file);
+            //solver.SaveAsDot(dfa, "aut", file);
 
             Assert.IsTrue(dfa.IsEquivalentWith(test, solver));
 
@@ -744,9 +744,9 @@ namespace TestPDL
 
             var test = solver.Convert(@"^$");
 
-            string file = "../../../TestPDL/DotFiles/EmptyStr";
+            //string file = "../../../TestPDL/DotFiles/EmptyStr";
 
-            solver.SaveAsDot(dfa, "aut", file);
+            //solver.SaveAsDot(dfa, "aut", file);
 
             Assert.IsTrue(dfa.IsEquivalentWith(test, solver));
 
@@ -768,8 +768,8 @@ namespace TestPDL
             System.Console.WriteLine(phi.Eval("babababb", new Dictionary<string, int>()));
 
             var dfa = phi.GetDFA(al, solver);
-            string file = "../../../TestPDL/DotFiles/aAtEven";
-            solver.SaveAsDot(dfa, "aut", file);
+            //string file = "../../../TestPDL/DotFiles/aAtEven";
+            //solver.SaveAsDot(dfa, "aut", file);
         }
 
         [TestMethod]
@@ -803,8 +803,8 @@ namespace TestPDL
             //System.Console.WriteLine(phi.Eval(Convert.ToString(57, 2), new Dictionary<string, int>()));
 
             var dfa = phi.GetDFA(al, solver);
-            //string file = "../../../TestPDL/DotFiles/mod3inBinary";
-            //solver.SaveAsDot(dfa, "aut", file);
+            ////string file = "../../../TestPDL/DotFiles/mod3inBinary";
+            ////solver.SaveAsDot(dfa, "aut", file);
 
         }
 
@@ -824,8 +824,8 @@ namespace TestPDL
             System.Console.WriteLine(phi.Eval("aac", new Dictionary<string, int>()));
 
             var dfa = phi.GetDFA(al, solver);
-            string file = "../../../TestPDL/DotFiles/eqString";
-            solver.SaveAsDot(dfa, "aut", file);
+            //string file = "../../../TestPDL/DotFiles/eqString";
+            //solver.SaveAsDot(dfa, "aut", file);
         }
 
         [TestMethod]
@@ -845,8 +845,8 @@ namespace TestPDL
             System.Console.WriteLine(phi.Eval("acabc", new Dictionary<string, int>()));
 
             var dfa = phi.GetDFA(al, solver);
-            string file = "../../../TestPDL/DotFiles/firstOcc";
-            solver.SaveAsDot(dfa, "aut", file);
+            //string file = "../../../TestPDL/DotFiles/firstOcc";
+            //solver.SaveAsDot(dfa, "aut", file);
         }
 
         [TestMethod]
@@ -862,8 +862,8 @@ namespace TestPDL
             System.Console.WriteLine(phi.Eval("aababb", new Dictionary<string, int>()));
 
             var dfa = phi.GetDFA(al, solver);
-            string file = "../../../TestPDL/DotFiles/lastOcc";
-            solver.SaveAsDot(dfa, "aut", file);
+            //string file = "../../../TestPDL/DotFiles/lastOcc";
+            //solver.SaveAsDot(dfa, "aut", file);
 
         }
 
@@ -877,8 +877,8 @@ namespace TestPDL
             var al = new HashSet<char>(alph);
 
             var dfa = phi.GetDFA(al, solver);
-            string file = "../../../TestPDL/DotFiles/EvenAfterFirstA";
-            solver.SaveAsDot(dfa, "aut", file);
+            //string file = "../../../TestPDL/DotFiles/EvenAfterFirstA";
+            //solver.SaveAsDot(dfa, "aut", file);
         }
 
         [TestMethod]
@@ -891,8 +891,8 @@ namespace TestPDL
             var al = new HashSet<char>(alph);
 
             var dfa = phi.GetDFA(al, solver);
-            string file = "../../../TestPDL/DotFiles/OddAfterFirstA";
-            solver.SaveAsDot(dfa, "aut", file);
+            //string file = "../../../TestPDL/DotFiles/OddAfterFirstA";
+            //solver.SaveAsDot(dfa, "aut", file);
 
 
         }

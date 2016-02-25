@@ -11,9 +11,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MSOZ3Test</RootNamespace>
     <AssemblyName>MSOZ3Test</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -23,6 +24,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,6 +33,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -39,6 +42,7 @@
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
@@ -47,19 +51,17 @@
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Automata, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\external\Microsoft.Automata.dll</HintPath>
+    <Reference Include="Automata">
+      <HintPath>..\external\Automata.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Automata.Z3, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\external\Microsoft.Automata.Z3.dll</HintPath>
+    <Reference Include="Automata.Z3">
+      <HintPath>..\external\Automata.Z3.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.Z3, Version=4.3.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Microsoft.Z3">
       <HintPath>..\external\Microsoft.Z3.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -75,22 +77,17 @@
   <ItemGroup>
     <Compile Include="EMSOTest.cs" />
     <Compile Include="MSOTest.cs" />
-    <Compile Include="MSOBenchmarkTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WS1SZ3Test.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AutomataPDL\AutomataPDL.csproj">
-      <Project>{C9EF5066-6D6E-46F7-8D88-9C50F933042E}</Project>
-      <Name>AutomataPDL</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MSOZ3\MSOZ3.csproj">
-      <Project>{8745F590-2663-4968-BFEA-500DDCE6C9E3}</Project>
-      <Name>MSOZ3</Name>
-    </ProjectReference>
+    <Folder Include="DotFiles\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="DotFiles\" />
+    <ProjectReference Include="..\MSOZ3\MSOZ3.csproj">
+      <Project>{8745f590-2663-4968-bfea-500ddce6c9e3}</Project>
+      <Name>MSOZ3</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -5,7 +5,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Microsoft.Automata;
-using Microsoft.Automata.Z3;
+
 using Microsoft.Z3;
 
 using MSOZ3;

@@ -61,10 +61,6 @@
       <Project>{C9EF5066-6D6E-46F7-8D88-9C50F933042E}</Project>
       <Name>AutomataPDL</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Mona\Mona.csproj">
-      <Project>{27966DC6-B42F-4B9C-98E8-C0D37A716DE5}</Project>
-      <Name>Mona</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MSOZ3\MSOZ3.csproj">
       <Project>{8745F590-2663-4968-BFEA-500DDCE6C9E3}</Project>
       <Name>MSOZ3</Name>

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 using MSOZ3;
@@ -35,7 +34,7 @@ namespace LTLMSO
 
         public abstract LTLFormula Simplify();
 
-        public Automaton<BvSet> getDFA(List<string> atoms, CharSetSolver solver)
+        public Automaton<BDD> getDFA(List<string> atoms, CharSetSolver solver)
         {
             var alph = solver.MkCharSetFromRange((char)0, (char)(Math.Pow(2, atoms.Count) - 1));
             return this.ToMSO().getDFA(alph, solver);
@@ -56,7 +55,7 @@ namespace LTLMSO
     public class LTLPred : LTLFormula
     {
         int index;
-        BvSet predicate;
+        BDD predicate;
 
         public LTLPred(string atom, List<string> atoms, CharSetSolver solver)
         {

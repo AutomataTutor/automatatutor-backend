@@ -1963,7 +1963,7 @@ namespace AutomataPDL
 
         public override bool KeepPredicate(PDLPred candidate)
         {
-            Automaton<BvSet> candidateDfa = candidate.GetDFA(this.alphabet, this.charsetSolver);
+            Automaton<BDD> candidateDfa = candidate.GetDFA(this.alphabet, this.charsetSolver);
 
             int stateDifference = Math.Abs(numOriginalStates - candidateDfa.StateCount);
             return IsAcceptableStateDifference(stateDifference);
