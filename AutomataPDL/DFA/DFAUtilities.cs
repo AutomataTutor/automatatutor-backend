@@ -218,7 +218,7 @@ namespace AutomataPDL
             Automaton<BDD> aut = null;
             try
             {
-                aut = solver.Convert(escapedRexpr);
+                aut = solver.Convert(escapedRexpr).RemoveEpsilons(solver.MkOr).Determinize(solver);
             }
             catch (ArgumentException e)
             {

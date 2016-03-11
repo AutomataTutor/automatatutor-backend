@@ -177,6 +177,35 @@ namespace TestPDL
         }
 
         [TestMethod]
+        public void RegexFeedbackDominik()
+        {
+            var solver = new CharSetSolver(BitWidth.BV64);
+            List<char> alph = new List<char> { '0', '1' };
+            HashSet<char> al = new HashSet<char>(alph);       
+
+            var escapedRexpr1 = string.Format(@"^(1*(01*01*01*)*)$");
+            var escapedRexpr2 = string.Format(@"^((0*0*0*)*)$");
+            Automaton<BDD> aut1 = null;
+            Automaton<BDD> aut2 = null;
+            try
+            {
+                aut1 = solver.Convert(escapedRexpr1).RemoveEpsilons(solver.MkOr).Determinize(solver); ;
+                aut2 = solver.Convert(escapedRexpr2).RemoveEpsilons(solver.MkOr).Determinize(solver); ;
+            }
+            catch (ArgumentException e)
+            {
+                throw new PDLException("The input is not a well formatted regular expression: " + e.Message);
+            }
+
+            var v1 = DFAGrading.GetGrade(aut1, aut2, al, solver, timeout, 10, FeedbackLevel.Minimal, true, false, false);
+
+            Console.WriteLine("Grade: {0}", v1.First);
+            foreach (var feed in v1.Second)
+                Console.WriteLine(feed.ToString());
+        }
+
+
+        [TestMethod]
         public void MaheshCase4()
         {
             // contains baba as substring
