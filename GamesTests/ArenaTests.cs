@@ -61,5 +61,63 @@ namespace Games.Tests
             Assert.IsTrue(arena.CPreOne(oneSet).Count == 2 && arena.CPreOne(oneSet).Contains(1) && arena.CPreOne(oneSet).Contains(0));
             Assert.IsTrue(arena.CPreOne(twoSet).Count == 1 && arena.CPreOne(twoSet).Contains(1));
         }
+
+        [TestMethod()]
+        public void ZeroAttractorTest()
+        {
+            var arena = new Arena();
+            arena.AddPlayerZeroNode(0);
+            arena.AddPlayerOneNode(1);
+            arena.AddPlayerZeroNode(2);
+            arena.AddEdge(0, 1);
+            arena.AddEdge(1, 2);
+            arena.AddEdge(1, 1);
+            arena.AddEdge(2, 0);
+
+            var zeroSet = new HashSet<int>();
+            zeroSet.Add(0);
+
+            var oneSet = new HashSet<int>();
+            oneSet.Add(1);
+
+            var twoSet = new HashSet<int>();
+            twoSet.Add(2);
+
+            Assert.IsTrue(arena.ZeroAttractor(zeroSet).Count == 2 &&
+                arena.ZeroAttractor(zeroSet).Contains(0) &&
+                arena.ZeroAttractor(zeroSet).Contains(2));
+        }
+
+        [TestMethod()]
+        public void OneAttractorTest()
+        {
+            var arena = new Arena();
+            arena.AddPlayerZeroNode(0);
+            arena.AddPlayerOneNode(1);
+            arena.AddPlayerZeroNode(2);
+            arena.AddEdge(0, 1);
+            arena.AddEdge(1, 2);
+            arena.AddEdge(1, 1);
+            arena.AddEdge(2, 0);
+
+            var zeroSet = new HashSet<int>();
+            zeroSet.Add(0);
+
+            var oneSet = new HashSet<int>();
+            oneSet.Add(1);
+
+            var twoSet = new HashSet<int>();
+            twoSet.Add(2);
+
+            Assert.IsTrue(arena.OneAttractor(zeroSet).Count == 3 &&
+                arena.OneAttractor(zeroSet).Contains(0) &&
+                arena.OneAttractor(zeroSet).Contains(1) &&
+                arena.OneAttractor(zeroSet).Contains(2));
+
+            Assert.IsTrue(arena.OneAttractor(twoSet).Count == 3 &&
+                arena.OneAttractor(twoSet).Contains(0) &&
+                arena.OneAttractor(twoSet).Contains(1) &&
+                arena.OneAttractor(twoSet).Contains(2));
+        }
     }
 }

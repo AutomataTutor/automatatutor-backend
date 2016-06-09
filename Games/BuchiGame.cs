@@ -60,6 +60,35 @@ namespace Games
         {
             return player == 0 ? CPreZero(target) : CPreOne(target);
         }
+
+        public ISet<int> ZeroAttractor(ISet<int> target)
+        {
+            var currentTarget = target;
+            var nextTarget = new HashSet<int>(target.Union(this.CPreZero(currentTarget)));
+            while (currentTarget.IsProperSubsetOf(nextTarget))
+            {
+                currentTarget = nextTarget;
+                nextTarget = new HashSet<int>(target.Union(this.CPreZero(currentTarget)));
+            }
+            return nextTarget;
+        }
+
+        public ISet<int> OneAttractor(ISet<int> target)
+        {
+            var currentTarget = target;
+            var nextTarget = new HashSet<int>(target.Union(this.CPreOne(currentTarget)));
+            while (currentTarget.IsProperSubsetOf(nextTarget))
+            {
+                currentTarget = nextTarget;
+                nextTarget = new HashSet<int>(target.Union(this.CPreOne(currentTarget)));
+            }
+            return nextTarget;
+        }
+
+        public ISet<int> Attractor(int player, ISet<int> target)
+        {
+            return player == 0 ? ZeroAttractor(target) : OneAttractor(target);
+        }
     }
 
     public class BuchiGame
