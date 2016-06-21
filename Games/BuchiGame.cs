@@ -13,6 +13,14 @@ namespace Games
         private ISet<int> playerOneNodes = new HashSet<int>();
         private ISet<Tuple<int,int>> edges = new HashSet<Tuple<int,int>>();
 
+        public ISet<int> GetNodes()
+        {
+            var retVal = new HashSet<int>();
+            retVal.UnionWith(playerZeroNodes);
+            retVal.UnionWith(playerOneNodes);
+            return retVal;
+        }
+
         public void AddPlayerZeroNode(int id)
         {
             Debug.Assert(!playerZeroNodes.Contains(id));
@@ -91,7 +99,41 @@ namespace Games
         }
     }
 
-    public class BuchiGame
+    public class ReachabilityGame
     {
+        private Arena arena;
+        private ISet<int> reachSet;
+
+        public ReachabilityGame(Arena arena, ISet<int> reachSet)
+        {
+            this.arena = arena;
+            this.reachSet = reachSet;
+        }
+
+        public Arena GetArena()
+        {
+            return this.arena;
+        }
+
+        public ISet<int> GetReachSet()
+        {
+            return this.reachSet;
+        }
+    }
+
+    public class ReachabilitySolver
+    {
+        public ISet<int> ComputeWinningRegionZero(ReachabilityGame game)
+        {
+            return game.GetArena().ZeroAttractor(game.GetReachSet());
+        }
+
+        public ISet<int> ComputeWinningRegionOne(ReachabilityGame game)
+        {
+            ISet<int> winningRegionZero = ComputeWinningRegionZero(game);
+            ISet<int> winningRegionOne = game.GetArena().GetNodes();
+            winningRegionOne.ExceptWith(winningRegionZero);
+            return winningRegionOne;
+        }
     }
 }
