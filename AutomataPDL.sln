@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{713252B1-4F24-4D2D-8C05-C0C2F8CDF066}"
 	ProjectSection(SolutionItems) = preProject
@@ -28,6 +28,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PumpingLemma", "PumpingLemma\PumpingLemma.csproj", "{4710971E-A01F-4B3D-A278-E091CCBF8976}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PumpingLemmaTest", "PumpingLemmaTest\PumpingLemmaTest.csproj", "{7C96C181-C60D-4AFB-919F-2A46EDC73113}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Games", "Games\Games.csproj", "{9D0436B6-3185-4169-AE2E-C037C6C20908}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GamesTests", "GamesTests\GamesTests.csproj", "{F6B79A69-DD03-4C96-80C9-C3FF83619F03}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -132,6 +136,30 @@ Global
 		{7C96C181-C60D-4AFB-919F-2A46EDC73113}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{7C96C181-C60D-4AFB-919F-2A46EDC73113}.Release|x86.ActiveCfg = Release|x86
 		{7C96C181-C60D-4AFB-919F-2A46EDC73113}.Release|x86.Build.0 = Release|x86
+		{9D0436B6-3185-4169-AE2E-C037C6C20908}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D0436B6-3185-4169-AE2E-C037C6C20908}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D0436B6-3185-4169-AE2E-C037C6C20908}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{9D0436B6-3185-4169-AE2E-C037C6C20908}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{9D0436B6-3185-4169-AE2E-C037C6C20908}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9D0436B6-3185-4169-AE2E-C037C6C20908}.Debug|x86.Build.0 = Debug|Any CPU
+		{9D0436B6-3185-4169-AE2E-C037C6C20908}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D0436B6-3185-4169-AE2E-C037C6C20908}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D0436B6-3185-4169-AE2E-C037C6C20908}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{9D0436B6-3185-4169-AE2E-C037C6C20908}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{9D0436B6-3185-4169-AE2E-C037C6C20908}.Release|x86.ActiveCfg = Release|Any CPU
+		{9D0436B6-3185-4169-AE2E-C037C6C20908}.Release|x86.Build.0 = Release|Any CPU
+		{F6B79A69-DD03-4C96-80C9-C3FF83619F03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6B79A69-DD03-4C96-80C9-C3FF83619F03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6B79A69-DD03-4C96-80C9-C3FF83619F03}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{F6B79A69-DD03-4C96-80C9-C3FF83619F03}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{F6B79A69-DD03-4C96-80C9-C3FF83619F03}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F6B79A69-DD03-4C96-80C9-C3FF83619F03}.Debug|x86.Build.0 = Debug|Any CPU
+		{F6B79A69-DD03-4C96-80C9-C3FF83619F03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6B79A69-DD03-4C96-80C9-C3FF83619F03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6B79A69-DD03-4C96-80C9-C3FF83619F03}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{F6B79A69-DD03-4C96-80C9-C3FF83619F03}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{F6B79A69-DD03-4C96-80C9-C3FF83619F03}.Release|x86.ActiveCfg = Release|Any CPU
+		{F6B79A69-DD03-4C96-80C9-C3FF83619F03}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

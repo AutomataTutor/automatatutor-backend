@@ -52,6 +52,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="ArenaTests.cs" />
+    <Compile Include="ReachabilityGameTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
