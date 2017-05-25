@@ -23,6 +23,35 @@ namespace WebServicePDL
     // [System.Web.Script.Services.ScriptService]
     public class Service1 : System.Web.Services.WebService
     {
+        [WebMethod]
+        public XElement ComputeFeedbackProductConstruction(XElement dfaDescList, XElement dfaAttemptDesc, XElement maxGrade, XElement feedbackLevel, XElement enabledFeedbacks)
+        {
+            //TODO: Alphabet
+
+            CharSetSolver solver = new CharSetSolver(BitWidth.BV64);
+            //Read input
+            var dfaPairList = DFAUtilities.parseDFAListFromXML(dfaDescList, solver);
+            var dfaCorrect = dfaPairList[0].Second;
+            for (int i = 1; i < dfaPairList.Count; i++)
+                dfaCorrect = dfaCorrect.Intersect(dfaPairList[i].Second, solver);
+
+            var dfaAttemptPair = DFAUtilities.parseDFAFromXML(dfaAttemptDesc, solver);
+
+            var level = FeedbackLevel.Hint;
+            var maxG = int.Parse(maxGrade.Value);
+
+            //Output
+            var feedbackGrade = DFAGrading.GetGrade(dfaCorrect, dfaAttemptPair.Second, dfaPairList[0].First, solver, 1500, maxG, level);
+
+            //Pretty print feedback
+            var feedString = "<ul>";
+            foreach (var feed in feedbackGrade.Second)
+                feedString += string.Format("<li>{0}</li>", feed);
+            feedString += "</ul>";
+
+            return XElement.Parse(string.Format("<div><grade>{0}</grade><feedString>{1}</feedString></div>", feedbackGrade.First, feedString));
+        }
+
 
         [WebMethod]
         public XElement ComputeFeedbackXML(XElement dfaCorrectDesc, XElement dfaAttemptDesc, XElement maxGrade, XElement feedbackLevel, XElement enabledFeedbacks)
