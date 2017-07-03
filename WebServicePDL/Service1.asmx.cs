@@ -8,6 +8,7 @@ using System.Text;
 
 using Microsoft.Automata;
 using AutomataPDL;
+using AutomataPDL.CFG;
 
 using System.Diagnostics;
 
@@ -245,9 +246,70 @@ namespace WebServicePDL
         }
 
         //---------------------------
+        // Grammar methods
+        //---------------------------
+
+        [WebMethod]
+        public XElement CheckGrammar(XElement grammar)
+        {
+            Func<char, char> f1 = delegate (char x)
+            {
+                return x;
+            };
+
+            try
+            {
+                var parsed = AutomataPDL.CFG.GrammarParser<char>.Parse(f1, grammar.Value);
+
+                return XElement.Parse(string.Format("<div>CorrectGrammar</div>"));
+            }
+            catch (AutomataPDL.CFG.ParseException ex)
+            {
+                return XElement.Parse(string.Format("<div>Error: {0} </div>", ex.Message));
+            }
+        }
+
+        [WebMethod]
+        public XElement isCNF(XElement grammar)
+        {
+            Func<char, char> f1 = delegate (char x)
+            {
+                return x;
+            };
+
+            try
+            {
+                var parsed = AutomataPDL.CFG.GrammarParser<char>.Parse(f1, grammar.Value);
+                
+                if (parsed.IsInCNF()) return XElement.Parse(string.Format("<div>y</div>"));
+                else return XElement.Parse(string.Format("<div>n</div>"));
+            }
+            catch (AutomataPDL.CFG.ParseException ex)
+            {
+                return XElement.Parse(string.Format("<div>Error: {0} </div>", ex.Message));
+            }
+        }
+
+        [WebMethod]
+        public XElement ComputeWordsInGrammarFeedback(XElement grammar, XElement wordsIn, XElement wordsOut, XElement maxGrade)
+        {
+            //TODO
+
+            return XElement.Parse(string.Format("<div><grade>{0}</grade><feedback>{1}</feedback></div>", maxG, "feedback"));
+        }
+
+        [WebMethod]
+        public XElement ComputeGrammarEqualityFeedback(XElement solution, XElement attempt, XElement maxGrade)
+        {
+            //TODO
+
+            return XElement.Parse(string.Format("<div><grade>{0}</grade><feedback>{1}</feedback></div>", 10, "feedback"));
+        }
+
+        //---------------------------
         // Pumping lemma methods
         //---------------------------
-        
+
         // Checks whether an arithmetic language description parses correctly
         [WebMethod]
         public XElement CheckArithLanguageDescription(
