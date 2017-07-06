@@ -248,18 +248,17 @@ namespace WebServicePDL
         //---------------------------
         // Grammar methods
         //---------------------------
+        private static Func<char, char> terminalCreation = delegate (char x)
+        {
+            return x;
+        };
 
         [WebMethod]
         public XElement CheckGrammar(XElement grammar)
         {
-            Func<char, char> f1 = delegate (char x)
-            {
-                return x;
-            };
-
             try
             {
-                var parsed = AutomataPDL.CFG.GrammarParser<char>.Parse(f1, grammar.Value);
+                var parsed = AutomataPDL.CFG.GrammarParser<char>.Parse(terminalCreation, grammar.Value);
 
                 return XElement.Parse(string.Format("<div>CorrectGrammar</div>"));
             }
@@ -272,38 +271,104 @@ namespace WebServicePDL
         [WebMethod]
         public XElement isCNF(XElement grammar)
         {
-            Func<char, char> f1 = delegate (char x)
-            {
-                return x;
-            };
-
             try
             {
-                var parsed = AutomataPDL.CFG.GrammarParser<char>.Parse(f1, grammar.Value);
-                
-                if (parsed.IsInCNF()) return XElement.Parse(string.Format("<div>y</div>"));
-                else return XElement.Parse(string.Format("<div>n</div>"));
+                var parsed = AutomataPDL.CFG.GrammarParser<char>.Parse(terminalCreation, grammar.Value);
+
+                var feedString = "<ul>";
+                bool allCNF = true;
+                List<String> feedback = new List<String>();
+                foreach (Production p in parsed.GetProductions())
+                {
+                    if (!p.IsCNF)
+                    {
+                        allCNF = false;
+                        feedString += string.Format("<li>The production \"{0}\" is not in CNF...</li>", p);
+                    }
+                }
+                feedString += "</ul>";
+
+                if (allCNF) return XElement.Parse("<div><res>y</res><feedback></feedback></div>");
+
+                return XElement.Parse(string.Format("<div><res>n</res><feedback>{0}</feedback></div>", feedString));
             }
             catch (AutomataPDL.CFG.ParseException ex)
             {
-                return XElement.Parse(string.Format("<div>Error: {0} </div>", ex.Message));
+                return XElement.Parse("<div><res>n</res><feedback>not parseable</feedback></div>");
             }
         }
 
         [WebMethod]
         public XElement ComputeWordsInGrammarFeedback(XElement grammar, XElement wordsIn, XElement wordsOut, XElement maxGrade)
         {
-            //TODO
+            //read inputs
+            ContextFreeGrammar g;
+            try
+            {
+                g = AutomataPDL.CFG.GrammarParser<char>.Parse(terminalCreation, grammar.Value);
+            }
+            catch (AutomataPDL.CFG.ParseException ex)
+            {
+                return XElement.Parse(string.Format("<div>Error: {0} </div>", ex.Message));
+            }
+            int maxG = int.Parse(maxGrade.Value);
+            List<String> wordsInList = new List<String>(), wordsOutList = new List<String>();
+            foreach (var wordElement in wordsIn.Elements())
+            {
+                wordsInList.Add(wordElement.Value);
+            }
+            foreach (var wordElement in wordsOut.Elements())
+            {
+                wordsOutList.Add(wordElement.Value);
+            }
 
-            return XElement.Parse(string.Format("<div><grade>{0}</grade><feedback>{1}</feedback></div>", maxG, "feedback"));
+            //grade
+            var result = GrammarGrading.gradeWordsInGrammar(g, wordsInList, wordsOutList, maxG);
+
+            //build return value
+            var feedString = "<ul>";
+            foreach (var feed in result.Item2)
+                feedString += string.Format("<li>{0}</li>", feed);
+            feedString += "</ul>";
+            int grade = result.Item1;
+
+            return XElement.Parse(string.Format("<div><grade>{0}</grade><feedback>{1}</feedback></div>", grade, feedString));
         }
 
         [WebMethod]
-        public XElement ComputeGrammarEqualityFeedback(XElement solution, XElement attempt, XElement maxGrade)
+        public XElement ComputeGrammarEqualityFeedback(XElement solution, XElement attempt, XElement maxGrade, XElement checkEmptyWord)
         {
-            //TODO
+            //read inputs
+            ContextFreeGrammar sol, att;
+            try
+            {
+                sol = AutomataPDL.CFG.GrammarParser<char>.Parse(terminalCreation, solution.Value);
+                att = AutomataPDL.CFG.GrammarParser<char>.Parse(terminalCreation, attempt.Value);
+            }
+            catch (AutomataPDL.CFG.ParseException ex)
+            {
+                return XElement.Parse(string.Format("<div><grade>{0}</grade><feedback>{1}</feedback></div>", -1, ex.Message));
+            }
+            int maxG = int.Parse(maxGrade.Value);
+            bool checkEW = bool.Parse(checkEmptyWord.Value);
 
-            return XElement.Parse(string.Format("<div><grade>{0}</grade><feedback>{1}</feedback></div>", 10, "feedback"));
+            //ignore empty string?
+            if (!checkEW)
+            {
+                att.setAcceptanceForEmptyString(sol.acceptsEmptyString());
+            }
+
+            //grade
+            var result = GrammarGrading.gradeGrammarEquality(sol, att, maxG, 1000);
+
+            //build return value
+            var feedString = "<ul>";
+            foreach (var feed in result.Item2)
+                feedString += string.Format("<li>{0}</li>", feed);
+            feedString += "</ul>";
+            int grade = result.Item1;
+
+            return XElement.Parse(string.Format("<div><grade>{0}</grade><feedback>{1}</feedback></div>", grade, feedString));
         }
 
         //---------------------------

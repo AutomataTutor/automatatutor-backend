@@ -218,12 +218,26 @@ namespace Games.Tests
         }
 
         [TestMethod()]
-        public void GrammarGradingTest1() //   balanced parenthesis  !!!could change if grading scale is changed!!!
+        public void GrammarGradingTest1() //   balanced parenthesis (wordsInGrammar)        !!!could change if grading scale is changed!!!
         {
             String sg1 = "S -> S S|(S)|";
             ContextFreeGrammar g = GrammarParser<char>.Parse(f1, sg1);
             var res = GrammarGrading.gradeWordsInGrammar(g, new[] { "()", "())()()(", "()((" }, new[] { "()(", "())()(", "xyz" }, 10);
             Assert.IsTrue(res.Item1 == 5);
+        }
+
+        [TestMethod()]
+        public void GrammarGradingTest2() //  a^n b^n (grammar equality)        !!!could change if grading scale is changed!!!
+        {
+            String sg1 = "S->absjjfhghs|X X->aXb|";
+            String sg2 = "S->aSb|aaSbb|";
+            ContextFreeGrammar g1 = GrammarParser<char>.Parse(f1, sg1);
+            ContextFreeGrammar g2 = GrammarParser<char>.Parse(f1, sg2);
+            var res = GrammarGrading.gradeGrammarEquality(g1, g2, 10, 50);
+            var res2 = GrammarGrading.gradeGrammarEquality(g2, g1, 10, 50);
+
+            Assert.IsTrue(res.Item1 == 9);
+            Assert.IsTrue(res2.Item1 == 9); //mirrored
         }
     }
 }

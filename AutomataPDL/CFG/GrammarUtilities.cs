@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Microsoft.Automata;
 
@@ -37,6 +38,26 @@ namespace AutomataPDL.CFG
                 }
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Generates a CNF that accepts the prefix closure of a given grammar.
+        /// </summary>
+        /// <param name="g">the original grammar</param>
+        /// <returns>the prefix closure</returns>
+        public static ContextFreeGrammar getCNFPrefixClosure(ContextFreeGrammar g)
+        {
+            if (g == null) return g;
+            if (!g.IsInCNF()) g = getEquivalentCNF(g);
+            if (g == null) return g;
+
+            var prefixClosure = getPrefixClosure(g);
+            prefixClosure = getEquivalentCNF(prefixClosure); // !!ATTENTION!! this may remove old productions
+
+            var productions = g.GetProductions();
+            productions = productions.Concat(prefixClosure.GetProductions());
+
+            return new ContextFreeGrammar(prefixClosure.StartSymbol, productions);
         }
 
         /// <summary>
@@ -112,14 +133,16 @@ namespace AutomataPDL.CFG
             if (word == null || grammar == null) return -1;
             if (!grammar.IsInCNF()) grammar = getEquivalentCNF(grammar);
             if (grammar == null) return -1;
-            
+
             //empty word
-            if (word.Length == 0) return 0;
+            if (word.Length == 0)
+            {
+                if (grammar.acceptsEmptyString()) return -2;
+                return 0;
+            }
 
             //prefix closure
-            Nonterminal originalStart = grammar.StartSymbol;
-            var prefixGrammar = getPrefixClosure(grammar);
-            prefixGrammar = getEquivalentCNF(prefixGrammar);
+            var prefixGrammar = getCNFPrefixClosure(grammar);
 
             //CYK
             var cyk_table = cyk(prefixGrammar, word);
@@ -292,6 +315,7 @@ namespace AutomataPDL.CFG
             long correct = 0;
             List<String> g1extra = new List<String>();
             List<String> g2extra = new List<String>();
+            List<String> ggg = new List<String>();
 
             if (cnf1 == null && cnf2 == null) return Tuple.Create(correct, g1extra, g2extra); ; //both empty
 
@@ -316,7 +340,11 @@ namespace AutomataPDL.CFG
                         g1extra.Add(w1);
                         if (!multiple) return Tuple.Create(correct, g1extra, g2extra);
                     }
-                    else correct++;
+                    else
+                    {
+                        ggg.Add(w1);
+                        correct++;
+                    }
                 }
                 foreach (string w2 in words2)
                 {

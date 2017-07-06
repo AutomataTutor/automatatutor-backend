@@ -56,7 +56,7 @@ namespace AutomataPDL.CFG
             lexbuf = buf;
             tokendescs[TokenType.NT] = new Regex(@"^([A-Z][A-Z0-9]*)"); // NonExprinal
             tokendescs[TokenType.T] = new Regex(@"^([a-z<>\[\]()\{\}])");    // Exprinal
-            tokendescs[TokenType.ARR] = new Regex(@"^->");               // Arrow
+            tokendescs[TokenType.ARR] = new Regex(@"^(->|=>)");               // Arrow
             tokendescs[TokenType.OR] = new Regex(@"^\|");               // Or
             tokendescs[TokenType.IG] = new Regex(@"^\s+");              // Ignorables
         }
