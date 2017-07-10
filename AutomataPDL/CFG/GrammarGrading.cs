@@ -111,5 +111,74 @@ namespace AutomataPDL.CFG
 
             return Tuple.Create(grade, (IEnumerable<String>)feedback);
         }
+
+        public static Tuple<int, IEnumerable<String>> gradeCYK(ContextFreeGrammar grammar, String word, HashSet<Nonterminal>[][] attempt, int maxGrade, bool withExample)
+        {
+            List<String> feedback = new List<String>();
+
+            int n = word.Length;
+            int checked_length = 0;
+            HashSet<Nonterminal>[][] sol = GrammarUtilities.cyk(grammar, word);
+            bool all_correct_sofar = true;
+
+            for (int len = 1; len <= n; len++)
+            {
+                for(int start = 0; start + len <= n; start++)
+                {
+                    HashSet<Nonterminal> must = sol[len - 1][start];
+                    HashSet<Nonterminal> was = attempt[len - 1][start];
+
+                    Nonterminal missingExample = null;
+                    int missing = 0;
+                    Nonterminal tooMuchExample = null;
+                    int tooMuch = 0;
+
+                    //check if all must are present
+                    foreach(Nonterminal nt in must)
+                    {
+                        if (!was.Contains(nt))
+                        {
+                            missingExample = nt;
+                            missing++;
+                            all_correct_sofar = false;
+                        }
+                    }
+
+                    //check if all given are correct
+                    foreach (Nonterminal nt in was)
+                    {
+                        if (!must.Contains(nt))
+                        {
+                            tooMuchExample = nt;
+                            tooMuch++;
+                            all_correct_sofar = false;
+                        }
+                    }
+
+                    //feedback
+                    String fieldName = String.Format("({0},{1})", start + 1, start + len);
+                    if (withExample)
+                    {
+                        if (missing != 0) feedback.Add(String.Format("You are missing some nonterminals in field {0} e.g. {1}", fieldName, missingExample));
+                        if (tooMuch != 0) feedback.Add(String.Format("You have nonterminals in field {0} that don't belong there... e.g. {1}", fieldName, tooMuchExample));
+                    } else
+                    {
+                        if (missing != 0) feedback.Add(String.Format("You are missing some nonterminals in field {0}...", fieldName));
+                        if (tooMuch != 0) feedback.Add(String.Format("You have nonterminals in field {0} that don't belong there...", fieldName));
+                    }
+                }
+                
+                if (!all_correct_sofar) break;
+                checked_length = len;
+            }
+
+            //grade
+            int grade = (int)Math.Floor(checked_length * maxGrade / (double) n);
+
+            //all correct?
+            if (feedback.Count == 0) feedback.Add("Correct!");
+
+            return Tuple.Create(grade, (IEnumerable<String>)feedback);
+        }
     }
 }

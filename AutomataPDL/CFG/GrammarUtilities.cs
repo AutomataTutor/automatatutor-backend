@@ -164,7 +164,7 @@ namespace AutomataPDL.CFG
         /// <param name="grammar">the grammar (in CNF)</param>
         /// <param name="word">the word (not null)</param>
         /// <returns>the filled table of the cyk-algorithm</returns>
-        private static HashSet<Nonterminal>[][] cyk(ContextFreeGrammar grammar, string word)
+        public static HashSet<Nonterminal>[][] cyk(ContextFreeGrammar grammar, string word)
         {
             //CYK algorithm
             int n = word.Length;

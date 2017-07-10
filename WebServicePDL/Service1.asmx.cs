@@ -371,6 +371,56 @@ namespace WebServicePDL
             return XElement.Parse(string.Format("<div><grade>{0}</grade><feedback>{1}</feedback></div>", grade, feedString));
         }
 
+        [WebMethod]
+        public XElement ComputeCYKFeedback(XElement grammar, XElement word, XElement attempt, XElement maxGrade)
+        {
+            //read inputs
+            ContextFreeGrammar g;
+            try
+            {
+                g = AutomataPDL.CFG.GrammarParser<char>.Parse(terminalCreation, grammar.Value);
+            }
+            catch (AutomataPDL.CFG.ParseException ex)
+            {
+                return XElement.Parse(string.Format("<div>Error: {0} </div>", ex.Message));
+            }
+            int maxG = int.Parse(maxGrade.Value);
+            String w = word.Value;
+            int n = w.Length;
+
+            //parse cyk_table
+            HashSet<Nonterminal>[][] cyk_table = new HashSet<Nonterminal>[n][];
+            for (int i = 0; i < n; i++)
+            {
+                cyk_table[i] = new HashSet<Nonterminal>[n - i];
+                for (int j = 0; j < n - i; j++) cyk_table[i][j] = new HashSet<Nonterminal>();
+            }
+            foreach (XElement cell in attempt.Elements())
+            {
+                int start = int.Parse(cell.Attribute("start").Value);
+                int end = int.Parse(cell.Attribute("end").Value);
+
+                var set = cyk_table[end - start][start - 1];
+                foreach (String nt in cell.Value.Split())
+                {
+                    if (nt.Length == 0) continue;
+                    set.Add(new Nonterminal(nt));
+                }
+            }
+
+            //grade
+            var result = GrammarGrading.gradeCYK(g, w, cyk_table, maxG, false);
+
+            //build return value
+            var feedString = "<ul>";
+            foreach (var feed in result.Item2)
+                feedString += string.Format("<li>{0}</li>", feed);
+            feedString += "</ul>";
+            int grade = result.Item1;
+
+            return XElement.Parse(string.Format("<div><grade>{0}</grade><feedback>{1}</feedback></div>", grade, feedString));
+        }
+
         //---------------------------
         // Pumping lemma methods
         //---------------------------
