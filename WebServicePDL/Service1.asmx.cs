@@ -397,6 +397,7 @@ namespace WebServicePDL
             }
             foreach (XElement cell in attempt.Elements())
             {
+                //get start and end cell; cell is for substring (start-1)...(end-1)
                 int start = int.Parse(cell.Attribute("start").Value);
                 int end = int.Parse(cell.Attribute("end").Value);
 
