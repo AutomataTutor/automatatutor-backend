@@ -84,6 +84,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CFG\ContextFreeGrammar.cs" />
+    <Compile Include="CFG\GrammarGrading.cs" />
+    <Compile Include="CFG\GrammarSymbol.cs" />
+    <Compile Include="CFG\GrammarUtilities.cs" />
+    <Compile Include="CFG\GrammarParser.cs" />
+    <Compile Include="CFG\Nonterminal.cs" />
+    <Compile Include="CFG\Production.cs" />
+    <Compile Include="CFG\Terminal.cs" />
     <Compile Include="NFA\NFAUtilities.cs" />
     <Compile Include="NFA\NFAFeedback.cs" />
     <Compile Include="Utilities\BitVecUtil.cs" />

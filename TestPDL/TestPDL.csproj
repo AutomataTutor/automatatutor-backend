@@ -71,6 +71,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Benchmarks.cs" />
+    <Compile Include="CFGTests.cs" />
     <Compile Include="NFAEditDistanceTest.cs" />
     <Compile Include="RegexParsing.cs" />
     <Compile Include="DFAEditDistanceTest.cs" />
