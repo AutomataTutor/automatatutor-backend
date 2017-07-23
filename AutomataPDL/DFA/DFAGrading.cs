@@ -18,16 +18,16 @@ namespace AutomataPDL
         /// </summary>
         /// <param name="solution">correct dfa</param>
         /// <param name="attempt">dfa to be graded</param>
-        /// <param name="alpahbet">input alphabet</param>
+        /// <param name="alphabet">input alphabet</param>
         /// <param name="solver">SMT solver for char set</param>
         /// <param name="timeout">timeout for the PDL enumeration (suggested > 1000)</param>
         /// <param name="maxGrade">Max grade for the homework</param>
         /// <returns>Grade for dfa2</returns>
         public static Pair<int, IEnumerable<DFAFeedback>> GetGrade(
-            Automaton<BDD> solution, Automaton<BDD> attempt, HashSet<char> alpahbet,
+            Automaton<BDD> solution, Automaton<BDD> attempt, HashSet<char> alphabet,
             CharSetSolver solver, long timeout, int maxGrade)
         {            
-            return GetGrade(solution, attempt, alpahbet, solver, timeout, maxGrade, FeedbackLevel.Minimal, true, true, true);
+            return GetGrade(solution, attempt, alphabet, solver, timeout, maxGrade, FeedbackLevel.Minimal, true, true, true);
         }
 
         /// <summary>

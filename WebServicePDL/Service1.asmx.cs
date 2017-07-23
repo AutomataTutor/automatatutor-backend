@@ -8,6 +8,7 @@ using System.Text;
 
 using Microsoft.Automata;
 using AutomataPDL;
+using AutomataPDL.Utilities;
 
 using System.Diagnostics;
 
@@ -23,25 +24,42 @@ namespace WebServicePDL
     // [System.Web.Script.Services.ScriptService]
     public class Service1 : System.Web.Services.WebService
     {
+        //-------- Product Construction --------//
+
         [WebMethod]
-        public XElement ComputeFeedbackProductConstruction(XElement dfaDescList, XElement dfaAttemptDesc, XElement maxGrade, XElement feedbackLevel, XElement enabledFeedbacks)
+        public XElement ComputeFeedbackProductConstruction(XElement dfaDescList, XElement dfaAttemptDesc, XElement booleanOperation, XElement maxGrade, XElement feedbackLevel, XElement enabledFeedbacks)
         {
-            //TODO: Alphabet
+            //TODO: Alphabet, Arbitrary Boolean Operations
 
             CharSetSolver solver = new CharSetSolver(BitWidth.BV64);
             //Read input
+            BooleanOperation boolOp = BooleanOperation.parseBooleanOperationFromXML(booleanOperation);
             var dfaPairList = DFAUtilities.parseDFAListFromXML(dfaDescList, solver);
-            var dfaCorrect = dfaPairList[0].Second;
-            for (int i = 1; i < dfaPairList.Count; i++)
-                dfaCorrect = dfaCorrect.Intersect(dfaPairList[i].Second, solver);
+            var alphabet = dfaPairList[0].First;
+            for (int i = 1; i < dfaPairList.Count; i++) {
+                foreach(char c in dfaPairList[i].First) {
+                    alphabet.Add(c);
+                }
+            }
+            //var dfaCorrect = dfaPairList[0].Second;
+            //for (int i = 1; i < dfaPairList.Count; i++)
+            //    dfaCorrect = dfaCorrect.Intersect(dfaPairList[i].Second, solver);
+
+            var dfaList = new List<Automaton<BDD>>();
+            for (int i = 0; i < dfaPairList.Count; i++) {
+                dfaList.Add(dfaPairList[i].Second);
+            }
+            var dfaCorrect = boolOp.executeOperationOnAutomataList(dfaList, solver);
 
             var dfaAttemptPair = DFAUtilities.parseDFAFromXML(dfaAttemptDesc, solver);
 
             var level = FeedbackLevel.Hint;
             var maxG = int.Parse(maxGrade.Value);
 
+
             //Output
             var feedbackGrade = DFAGrading.GetGrade(dfaCorrect, dfaAttemptPair.Second, dfaPairList[0].First, solver, 1500, maxG, level);
+
 
             //Pretty print feedback
             var feedString = "<ul>";
@@ -52,6 +70,39 @@ namespace WebServicePDL
             return XElement.Parse(string.Format("<div><grade>{0}</grade><feedString>{1}</feedString></div>", feedbackGrade.First, feedString));
         }
 
+        //-------- Minimization --------//
+
+        [WebMethod]
+        public XElement ComputeFeedbackMinimization(XElement dfaDesc, XElement dfaAttemptDesc, XElement maxGrade, XElement feedbackLevel, XElement enableFeedbacks)
+        {
+            CharSetSolver solver = new CharSetSolver(BitWidth.BV64);
+
+            //Read input
+            var dfaPair = DFAUtilities.parseDFAFromXML(dfaDesc, solver);
+            var dfaCorrect = dfaPair.Second.Minimize(solver);
+
+            var dfaAttemptPair = DFAUtilities.parseDFAFromXML(dfaAttemptDesc, solver);
+            var dfaAttempt = dfaAttemptPair.Second;
+
+            var level = FeedbackLevel.Hint;
+            var maxG = int.Parse(maxGrade.Value);
+
+
+            //Output
+            //TODO: ...
+            var feedbackGrade = DFAGrading.GetGrade(dfaCorrect, dfaAttemptPair.Second, dfaPair.First, solver, 1500, maxG, level);
+
+
+            //Pretty print feedback
+            var feedString = "<ul>";
+            foreach (var feed in feedbackGrade.Second)
+                feedString += string.Format("<li>{0}</li>", feed);
+            feedString += "</ul>";
+
+            return XElement.Parse(string.Format("<div><grade>{0}</grade><feedString>{1}</feedString></div>", feedbackGrade.First, feedString));
+        }
+
+        //-------- DFA Construction --------//
 
         [WebMethod]
         public XElement ComputeFeedbackXML(XElement dfaCorrectDesc, XElement dfaAttemptDesc, XElement maxGrade, XElement feedbackLevel, XElement enabledFeedbacks)
@@ -111,7 +162,7 @@ namespace WebServicePDL
         }
 
         
-
+        //-------- NFA Construction --------//
 
         [WebMethod]
         public XElement ComputeFeedbackNFAXML(XElement nfaCorrectDesc, XElement nfaAttemptDesc, XElement maxGrade, XElement feedbackLevel, XElement enabledFeedbacks, XElement userId)
@@ -171,6 +222,8 @@ namespace WebServicePDL
 
             return outXML;
         }
+
+        //-------- NFA to DFA --------//
 
         [WebMethod]
         public XElement ComputeFeedbackNfaToDfa(XElement nfaCorrectDesc, XElement dfaAttemptDesc, XElement maxGrade)

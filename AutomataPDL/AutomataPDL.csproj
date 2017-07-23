@@ -87,6 +87,7 @@
     <Compile Include="NFA\NFAUtilities.cs" />
     <Compile Include="NFA\NFAFeedback.cs" />
     <Compile Include="Utilities\BitVecUtil.cs" />
+    <Compile Include="Utilities\BooleanOperation.cs" />
     <Compile Include="Utilities\Log.cs" />
     <Compile Include="DFA\DFADensity.cs" />
     <Compile Include="DFA\DFAEditDistance.cs" />
