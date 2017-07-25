@@ -48,7 +48,7 @@ namespace WebServicePDL
 
             var dfaList = new List<Automaton<BDD>>();
             for (int i = 0; i < dfaPairList.Count; i++) {
-                dfaList.Add(dfaPairList[i].Second);
+                dfaList.Add(dfaPairList[i].Second.Determinize(solver).Minimize(solver));
             }
             var dfaCorrect = boolOp.executeOperationOnAutomataList(dfaList, solver);
 
@@ -56,7 +56,6 @@ namespace WebServicePDL
 
             var level = FeedbackLevel.Hint;
             var maxG = int.Parse(maxGrade.Value);
-
 
             //Output
             var feedbackGrade = DFAGrading.GetGrade(dfaCorrect, dfaAttemptPair.Second, dfaPairList[0].First, solver, 1500, maxG, level);

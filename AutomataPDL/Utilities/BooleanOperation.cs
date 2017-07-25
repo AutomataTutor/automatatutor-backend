@@ -62,16 +62,16 @@ namespace AutomataPDL.Utilities
         {
             switch (operation) {
                 case -1:
-                    return left.executeOnAutomataList(automataList, solver).Complement(solver);
+                    return left.executeOnAutomataList(automataList, solver).Complement(solver).Minimize(solver);
                 case 0:
-                    return left.executeOnAutomataList(automataList, solver).Intersect(right.executeOnAutomataList(automataList, solver), solver);
+                    return left.executeOnAutomataList(automataList, solver).Intersect(right.executeOnAutomataList(automataList, solver), solver).Determinize(solver).Minimize(solver);
                 case 1:
-                    return left.executeOnAutomataList(automataList, solver).Union(right.executeOnAutomataList(automataList, solver), solver);
+                    return left.executeOnAutomataList(automataList, solver).Union(right.executeOnAutomataList(automataList, solver), solver).Determinize(solver).Minimize(solver);
                 case 2:
-                    return left.executeOnAutomataList(automataList, solver).Complement(solver).Union(right.executeOnAutomataList(automataList, solver), solver);
+                    return left.executeOnAutomataList(automataList, solver).Complement(solver).Union(right.executeOnAutomataList(automataList, solver), solver).Determinize(solver).Minimize(solver);
                 case 3:
                     return left.executeOnAutomataList(automataList, solver).Intersect(right.executeOnAutomataList(automataList, solver), solver).Union(
-                        left.executeOnAutomataList(automataList, solver).Complement(solver).Intersect((right.executeOnAutomataList(automataList, solver)).Complement(solver), solver));
+                        left.executeOnAutomataList(automataList, solver).Complement(solver).Intersect((right.executeOnAutomataList(automataList, solver)).Complement(solver), solver)).Determinize(solver).Minimize(solver);
                 case 42:
                     if(content <= automataList.Count())
                         return automataList[content - 1];
