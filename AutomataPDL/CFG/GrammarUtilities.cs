@@ -17,6 +17,7 @@ namespace AutomataPDL.CFG
         /// <returns>the CNF or null</returns>
         public static ContextFreeGrammar getEquivalentCNF(ContextFreeGrammar g)
         {
+            if (g == null) return null;
             if (g.IsInCNF()) return g;
             
             try
@@ -319,16 +320,10 @@ namespace AutomataPDL.CFG
 
             if (cnf1 == null && cnf2 == null) return Tuple.Create(correct, g1extra, g2extra); ; //both empty
 
-            //check for empty word
-            if (cnf1.acceptsEmptyString() && !cnf2.acceptsEmptyString()) g1extra.Add("");
-            else if (!cnf1.acceptsEmptyString() && cnf2.acceptsEmptyString()) g2extra.Add("");
-            else correct++;
-
-
             Dictionary<Nonterminal, Dictionary<int, HashSet<string>>> dp1 = new Dictionary<Nonterminal, Dictionary<int, HashSet<string>>>();
             Dictionary<Nonterminal, Dictionary<int, HashSet<string>>> dp2 = new Dictionary<Nonterminal, Dictionary<int, HashSet<string>>>();
 
-            int length = 1;
+            int length = 0;
             while (watch.ElapsedMilliseconds < timelimit)
             {
                 var words1 = generateWordsWithLength(cnf1, length, dp1);
@@ -363,8 +358,13 @@ namespace AutomataPDL.CFG
 
         private static HashSet<string> generateWordsWithLength(ContextFreeGrammar cnf, int length, Dictionary<Nonterminal, Dictionary<int, HashSet<string>>> dp)
         {
-            HashSet<string> res = null;
-            if (length == 1) //case: length = 1
+            HashSet<string> res = new HashSet<string>();
+            if (cnf == null) return res; //empty grammar -> can't generate any words
+            if (length == 0) //case: length = 0
+            {
+                if (cnf.acceptsEmptyString()) res.Add("");
+            }
+            else if (length == 1) //case: length = 1
             {
                 foreach (Nonterminal nt in cnf.Variables)
                 {

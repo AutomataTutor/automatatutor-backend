@@ -345,7 +345,7 @@ namespace WebServicePDL
             }
             catch (AutomataPDL.CFG.ParseException ex)
             {
-                return XElement.Parse(string.Format("<div>Error: {0} </div>", ex.Message));
+                return XElement.Parse(string.Format("<div>Parsing Error: {0} </div>", ex.Message));
             }
         }
 
@@ -375,7 +375,7 @@ namespace WebServicePDL
             }
             catch (AutomataPDL.CFG.ParseException ex)
             {
-                return XElement.Parse("<div><res>n</res><feedback>not parseable</feedback></div>");
+                return XElement.Parse(string.Format("<div><res>n</res><feedback>Parsing Error: {0}</feedback></div>", ex.Message));
             }
         }
 
@@ -390,7 +390,7 @@ namespace WebServicePDL
             }
             catch (AutomataPDL.CFG.ParseException ex)
             {
-                return XElement.Parse(string.Format("<div>Error: {0} </div>", ex.Message));
+                return XElement.Parse(string.Format("<div>Parsing Error: {0} </div>", ex.Message));
             }
             int maxG = int.Parse(maxGrade.Value);
             List<String> wordsInList = new List<String>(), wordsOutList = new List<String>();
@@ -428,7 +428,7 @@ namespace WebServicePDL
             }
             catch (AutomataPDL.CFG.ParseException ex)
             {
-                return XElement.Parse(string.Format("<div><grade>{0}</grade><feedback>{1}</feedback></div>", -1, ex.Message));
+                return XElement.Parse(string.Format("<div><grade>{0}</grade><feedback>Parsing Error: {1}</feedback></div>", -1, ex.Message));
             }
             int maxG = int.Parse(maxGrade.Value);
             bool checkEW = bool.Parse(checkEmptyWord.Value);
@@ -463,7 +463,7 @@ namespace WebServicePDL
             }
             catch (AutomataPDL.CFG.ParseException ex)
             {
-                return XElement.Parse(string.Format("<div>Error: {0} </div>", ex.Message));
+                return XElement.Parse(string.Format("<div>Parsing Error: {0} </div>", ex.Message));
             }
             int maxG = int.Parse(maxGrade.Value);
             String w = word.Value;
