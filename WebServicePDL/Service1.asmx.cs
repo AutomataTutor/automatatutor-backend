@@ -396,11 +396,15 @@ namespace WebServicePDL
             List<String> wordsInList = new List<String>(), wordsOutList = new List<String>();
             foreach (var wordElement in wordsIn.Elements())
             {
-                wordsInList.Add(wordElement.Value);
+                string w = wordElement.Value;
+                if (w.Length > 75) w = w.Substring(0, 75); //limit word length
+                wordsInList.Add(w);
             }
             foreach (var wordElement in wordsOut.Elements())
             {
-                wordsOutList.Add(wordElement.Value);
+                string w = wordElement.Value;
+                if (w.Length > 75) w = w.Substring(0, 75);  //limit word length
+                wordsOutList.Add(w);
             }
 
             //grade
