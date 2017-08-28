@@ -218,6 +218,22 @@ namespace Games.Tests
         }
 
         [TestMethod()]
+        public void EqualityTest7() //   empty grammars and invariants
+        {
+            String sg1 = "S -> S S|(S)|";
+            ContextFreeGrammar g1 = GrammarParser<char>.Parse(f1, sg1);
+
+            var res = GrammarUtilities.findDifferenceWithTimelimit(g1, null, true, 25);
+            Assert.IsTrue(res.Item1 == 0 && res.Item2.Count > 0 && res.Item3.Count == 0);
+            res = GrammarUtilities.findDifferenceWithTimelimit(null, g1, true, 25);
+            Assert.IsTrue(res.Item1 == 0 && res.Item2.Count == 0 && res.Item3.Count > 0);
+            res = GrammarUtilities.findDifferenceWithTimelimit(g1, g1, true, 25);
+            Assert.IsTrue(res.Item1 > 0 && res.Item2.Count == 0 && res.Item3.Count == 0);
+            res = GrammarUtilities.findDifferenceWithTimelimit(null, null, true, 30);
+            Assert.IsTrue(res.Item1 == 0 && res.Item2.Count == 0 && res.Item3.Count == 0);
+        }
+
+        [TestMethod()]
         public void GrammarGradingTest1() //   balanced parenthesis (wordsInGrammar)        !!!could change if grading scale is changed!!!
         {
             String sg1 = "S -> S S|(S)|";

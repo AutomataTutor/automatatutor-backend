@@ -13,6 +13,7 @@ namespace AutomataPDL.CFG
         public TokenType t;
         public string content;
         public int length;
+        public int pos;
         override public string ToString()
         {
             string type = "";
@@ -49,11 +50,13 @@ namespace AutomataPDL.CFG
     internal class Lexer
     {
         private string lexbuf;
+        public string input;
         private Dictionary<TokenType, Regex> tokendescs = new Dictionary<TokenType, Regex>();
 
         public Lexer(string buf)
         {
             lexbuf = buf;
+            input = buf;
             tokendescs[TokenType.NT] = new Regex(@"^([A-Z][A-Z0-9]*)"); // NonExprinal
             tokendescs[TokenType.T] = new Regex(@"^([a-z<>\[\]()\{\}])");    // Exprinal
             tokendescs[TokenType.ARR] = new Regex(@"^(->|=>)");               // Arrow
@@ -67,6 +70,7 @@ namespace AutomataPDL.CFG
             next.t = TokenType.ERR;
             next.length = 1;
             next.content = "";
+            next.pos = input.Length - lexbuf.Length;
 
             foreach (KeyValuePair<TokenType, Regex> pair in tokendescs)
             {
@@ -83,6 +87,7 @@ namespace AutomataPDL.CFG
 
                     break;
                 }
+                else next.content = lexbuf;
             } // end loop over token types
             return next;
         }
@@ -160,7 +165,7 @@ namespace AutomataPDL.CFG
             Token next = lexer.Next();
             if (next.t != TokenType.NT)
             {
-                throw new ParseException("Expected Nonterminal...");
+                throw new ParseException(string.Format("Expected Nonterminal... ({0})", generateLocationString(next)));
             }
 
             return new Nonterminal(next.content);
@@ -171,7 +176,7 @@ namespace AutomataPDL.CFG
             Token next = lexer.Next();
             if (next.t != TokenType.ARR)
             {
-                throw new ParseException("Expected arrow...");
+                throw new ParseException(string.Format("Expected arrow... ({0})", generateLocationString(next)));
             }
         }
 
@@ -207,11 +212,11 @@ namespace AutomataPDL.CFG
                     case TokenType.ARR:
                         if (currhs.Count < 1)
                         {
-                            throw new ParseException("Cannot start with an arrow...");
+                            throw new ParseException(string.Format("A production cannot start with an arrow... ({0})", generateLocationString(cur)));
                         }
                         if (last.t != TokenType.NT)
                         {
-                            throw new ParseException("On the left hand side of every arrow has to be a Nonterminal...");
+                            throw new ParseException(string.Format("On the left hand side of every arrow has to be a Nonterminal... ({0})", generateLocationString(cur)));
                         }
 
                         // downcast :(
@@ -227,7 +232,7 @@ namespace AutomataPDL.CFG
                         done = true;
                         break;
                     default:
-                        throw new ParseException("The grammar couldn't be parsed. Please check the syntax...");
+                        throw new ParseException(string.Format("The grammar couldn't be parsed. Please check the syntax... ({0})", generateLocationString(cur)));
                 }
             }
         }
@@ -235,6 +240,16 @@ namespace AutomataPDL.CFG
         private ContextFreeGrammar GetGrammar()
         {
             return new ContextFreeGrammar(startvar, productions);
+        }
+
+        //Generates the location string for a parsing error message. The location is given by a token.
+        private string generateLocationString(Token t)
+        {
+            string res = lexer.input.Substring(t.pos);
+            if (res.Length > 20) res = res.Substring(0, 20);
+            res = string.Format("error occured just before \"{0}\"", res);
+            res = res.Replace("&", "&amp;").Replace("'", "&apos;").Replace("\"", "&quot;").Replace(">", "&gt;").Replace("<", "&lt;");
+            return res;
         }
     }
 }
