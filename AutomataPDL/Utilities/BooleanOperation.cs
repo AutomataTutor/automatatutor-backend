@@ -33,6 +33,28 @@ namespace AutomataPDL.Utilities
             content = cont;
         }
 
+        public bool IsTrueForInterpretation(bool[] interpretation)
+        {
+            switch (operation) {
+                case -1:
+                    return !left.IsTrueForInterpretation(interpretation);
+                case 0:
+                    return left.IsTrueForInterpretation(interpretation) && right.IsTrueForInterpretation(interpretation);
+                case 1:
+                    return left.IsTrueForInterpretation(interpretation) || right.IsTrueForInterpretation(interpretation);
+                case 2:
+                    return !left.IsTrueForInterpretation(interpretation) || right.IsTrueForInterpretation(interpretation);
+                case 3:
+                    bool a = left.IsTrueForInterpretation(interpretation);
+                    bool b = right.IsTrueForInterpretation(interpretation);
+                    return (!a && !b) || (a && b);
+                case 42:
+                    return interpretation[content];
+            }
+
+            return false;
+        }
+
         public Automaton<BDD> executeOperationOnAutomataList(List<Automaton<BDD>> automataList, CharSetSolver solver)
         {
             if (matchesAutomataList(automataList))
@@ -52,7 +74,7 @@ namespace AutomataPDL.Utilities
                 case 3:
                     return left.matchesAutomataList(automataList) && right.matchesAutomataList(automataList);
                 case 42:
-                    return content > 0 && content <= automataList.Count();
+                    return content >= 0 && content < automataList.Count();
             }
 
             return false;
@@ -73,8 +95,8 @@ namespace AutomataPDL.Utilities
                     return left.executeOnAutomataList(automataList, solver).Intersect(right.executeOnAutomataList(automataList, solver), solver).Union(
                         left.executeOnAutomataList(automataList, solver).Complement(solver).Intersect((right.executeOnAutomataList(automataList, solver)).Complement(solver), solver)).Determinize(solver).Minimize(solver);
                 case 42:
-                    if(content <= automataList.Count())
-                        return automataList[content - 1];
+                    if(content < automataList.Count())
+                        return automataList[content];
 
                     return null;
             }
@@ -82,6 +104,7 @@ namespace AutomataPDL.Utilities
             return null;
         }
 
+        //TODO: Variables start from 0
         public static BooleanOperation parseBooleanOperationFromXML(XElement boolOp)
         {
             XElement xelem = XElement.Parse(RemoveAllNamespaces(boolOp.ToString()));
@@ -93,7 +116,7 @@ namespace AutomataPDL.Utilities
             return null;
         }
         
-        private static BooleanOperation parseBooleanOperationFromString(string op)
+        public static BooleanOperation parseBooleanOperationFromString(string op)
         {
             int bracketLevel = 0;
             int highestOperation = -1;

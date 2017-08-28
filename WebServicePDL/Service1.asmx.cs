@@ -8,6 +8,7 @@ using System.Text;
 
 using Microsoft.Automata;
 using AutomataPDL;
+using AutomataPDL.Automata;
 using AutomataPDL.CFG;
 using AutomataPDL.Utilities;
 
@@ -32,9 +33,21 @@ namespace WebServicePDL
         {
             //TODO: Alphabet, Arbitrary Boolean Operations
 
+            var DfaList = AutomataUtilities.ParseDFAListFromXML(dfaDescList);
+            var attemptDfa = AutomataUtilities.ParseDFAFromXML(dfaAttemptDesc);
+            var boolOp = BooleanOperation.parseBooleanOperationFromXML(booleanOperation);
+
+            var feedbackGrade = AutomataFeedback.FeedbackForProductConstruction<char>(DfaList, boolOp, attemptDfa);
+            var feedString = "<ul>";
+            foreach (var feed in feedbackGrade.Item2)
+            {
+                feedString += string.Format("<li>{0}</li>", feed);
+            }
+            feedString += "</ul>";
+
+            /*
             CharSetSolver solver = new CharSetSolver(BitWidth.BV64);
             //Read input
-            BooleanOperation boolOp = BooleanOperation.parseBooleanOperationFromXML(booleanOperation);
             var dfaPairList = DFAUtilities.parseDFAListFromXML(dfaDescList, solver);
             var alphabet = dfaPairList[0].First;
             for (int i = 1; i < dfaPairList.Count; i++) {
@@ -65,16 +78,23 @@ namespace WebServicePDL
             var feedString = "<ul>";
             foreach (var feed in feedbackGrade.Second)
                 feedString += string.Format("<li>{0}</li>", feed);
-            feedString += "</ul>";
+            feedString += "</ul>";*/
 
-            return XElement.Parse(string.Format("<div><grade>{0}</grade><feedString>{1}</feedString></div>", feedbackGrade.First, feedString));
+            return XElement.Parse(string.Format("<div><grade>{0}</grade><feedString>{1}</feedString></div>", feedbackGrade.Item1, feedString));
         }
 
         //-------- Minimization --------//
 
         [WebMethod]
-        public XElement ComputeFeedbackMinimization(XElement dfaDesc, XElement dfaAttemptDesc, XElement maxGrade, XElement feedbackLevel, XElement enableFeedbacks)
+        public XElement ComputeFeedbackMinimization(XElement dfaDesc, XElement minimizationTableAttempt, XElement dfaAttemptDesc, XElement maxGrade, XElement feedbackLevel, XElement enableFeedbacks)
         {
+            var D = AutomataUtilities.ParseDFAFromXML(dfaDesc);
+            var tableCorrect = AutomataUtilities.GetTableFromPartition(D.ComputeLanguagePartition());
+            var tableAttempt = AutomataUtilities.ParseMinimizationTableFromXML(minimizationTableAttempt);
+
+            var feedbackGrade = AutomataFeedback.FeedbackForMinimization(tableCorrect, tableAttempt);
+
+            /*
             CharSetSolver solver = new CharSetSolver(BitWidth.BV64);
 
             //Read input
@@ -86,20 +106,19 @@ namespace WebServicePDL
 
             var level = FeedbackLevel.Hint;
             var maxG = int.Parse(maxGrade.Value);
-
-
+            
             //Output
             //TODO: ...
             var feedbackGrade = DFAGrading.GetGrade(dfaCorrect, dfaAttemptPair.Second, dfaPair.First, solver, 1500, maxG, level);
-
+            */
 
             //Pretty print feedback
             var feedString = "<ul>";
-            foreach (var feed in feedbackGrade.Second)
+            foreach (var feed in feedbackGrade.Item2)
                 feedString += string.Format("<li>{0}</li>", feed);
             feedString += "</ul>";
 
-            return XElement.Parse(string.Format("<div><grade>{0}</grade><feedString>{1}</feedString></div>", feedbackGrade.First, feedString));
+            return XElement.Parse(string.Format("<div><grade>{0}</grade><feedString>{1}</feedString></div>", feedbackGrade.Item1, feedString));
         }
 
         //-------- DFA Construction --------//
@@ -227,6 +246,23 @@ namespace WebServicePDL
 
         [WebMethod]
         public XElement ComputeFeedbackNfaToDfa(XElement nfaCorrectDesc, XElement dfaAttemptDesc, XElement maxGrade)
+        {
+            var nfa = AutomataUtilities.ParseNFAFromXML(nfaCorrectDesc);
+            var attemptDfa = AutomataUtilities.ParseDFAFromXML(dfaAttemptDesc);
+
+            var feedbackGrade = AutomataFeedback.FeedbackForPowersetConstruction<char>(nfa, attemptDfa);
+            var feedString = "<ul>";
+            foreach (var feed in feedbackGrade.Item2)
+            {
+                feedString += string.Format("<li>{0}</li>", feed);
+            }
+            feedString += "</ul>";
+
+            return XElement.Parse(string.Format("<div><grade>{0}</grade><feedString>{1}</feedString></div>", feedbackGrade.Item1, feedString));
+        }
+
+        [WebMethod]
+        public XElement ComputeFeedbackNfaToDfaOld(XElement nfaCorrectDesc, XElement dfaAttemptDesc, XElement maxGrade)
         {
             #region Check if item is in cache
             StringBuilder key = new StringBuilder();
