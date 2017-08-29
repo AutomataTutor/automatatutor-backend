@@ -68,6 +68,89 @@ namespace AutomataPDL.Automata
             return ReadWordFrom(sequence, q_0);
         }
 
+        public string[] GetMinimizationTable()
+        {
+            int n = Q.Count;
+            string[] T = new string[(n * n - n) / 2];
+            bool stop = true;
+
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = i + 1; j < n; j++)
+                {
+                    var p = Q.ElementAt(i);
+                    var q = Q.ElementAt(j);
+
+                    if (p.id > q.id)
+                    {
+                        var tmp = p;
+                        p = q;
+                        q = tmp;
+                    }
+
+                    bool b = F.Contains(p);
+                    bool c = F.Contains(q);
+
+                    if ((b && !c) || (!b && c))
+                    {
+                        T[(q.id * q.id - q.id) / 2 + p.id] = "";
+                        stop = false;
+                    }
+                }
+            }
+
+            while (!stop)
+            {
+                stop = true;
+                for (int i = 0; i < n; i++)
+                {
+                    for (int j = i + 1; j < n; j++)
+                    {
+                        var p = Q.ElementAt(i);
+                        var q = Q.ElementAt(j);
+
+                        if (p.id > q.id)
+                        {
+                            var tmp = p;
+                            p = q;
+                            q = tmp;
+                        }
+
+                        if (T[(q.id * q.id - q.id) / 2 + p.id] == null)
+                        {
+                            foreach (C a in Sigma)
+                            {
+                                State<S> p_dash, q_dash;
+                                if (!delta.TryGetValue(new TwoTuple<State<S>, C>(p, a), out p_dash)) { }
+                                if (!delta.TryGetValue(new TwoTuple<State<S>, C>(q, a), out q_dash)) { }
+
+                                if (!p_dash.Equals(q_dash))
+                                {
+                                    if (p_dash.id > q_dash.id)
+                                    {
+                                        var tmp = p_dash;
+                                        p_dash = q_dash;
+                                        q_dash = tmp;
+                                    }
+
+                                    string s = T[(q_dash.id * q_dash.id - q_dash.id) / 2 + p_dash.id];
+
+                                    if (s != null)
+                                    {
+                                        T[(q.id * q.id - q.id) / 2 + p.id] = a.ToString() + s;
+                                        stop = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return T;
+        }
+
         /*  METHOD THAT MINIMIZES THIS DFA USING HOPCROFT'S ALGORITHM
         *
         *   Output: Minimal DFA recognizing the same language as this one.

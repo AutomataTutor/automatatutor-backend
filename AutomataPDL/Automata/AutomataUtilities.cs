@@ -609,6 +609,49 @@ namespace AutomataPDL.Automata
             return table;
         }
 
+        public static string[] ParseMinimizationTableShortestWordsFromXML(XElement minimization_table_wrapped)
+        {
+            XElement minimization_table = XElement.Parse(RemoveAllNamespaces(minimization_table_wrapped.ToString()));
+
+            int stateCount = Int32.Parse(minimization_table.Element("stateCount").Value);
+            string[] table = new string[(stateCount * stateCount - stateCount) / 2];
+
+            XElement entries = minimization_table.Element("entries");
+            foreach (XElement child in entries.Elements())
+            {
+                if (child.Name == "entry")
+                {
+                    int i = Int32.Parse(child.Element("i").Value);
+                    int j = Int32.Parse(child.Element("j").Value);
+                    if (j < i)
+                    {
+                        int temp = i;
+                        i = j;
+                        j = temp;
+                    }
+                    if (i == j)
+                    {
+                        //TODO: throw exception
+                    }
+                    string s = child.Element("word").Value;
+                    if (s.Equals("epsilon"))
+                    {
+                        table[(j * j - j) / 2 + i] = "";
+                    }
+                    else if (s.Equals(""))
+                    {
+                        table[(j * j - j) / 2 + i] = null;
+                    }
+                    else
+                    {
+                        table[(j * j - j) / 2 + i] = s;
+                    }
+                }
+            }
+
+            return table;
+        }
+
         /*  METHOD THAT PARSES A LANGUAGE PARTITION FROM A GIVEN XML-FILE
         *
         *   

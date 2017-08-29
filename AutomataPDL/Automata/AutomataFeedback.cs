@@ -175,6 +175,12 @@ namespace AutomataPDL.Automata
                     }
                 }
             }
+            
+            if (feedbackList.Count > 3)
+            {
+                feedbackList.RemoveRange(3, feedbackList.Count - 3);
+                feedbackList.Add("There may be more mistakes!");
+            }
 
             bool acceptingCorrect = true;
             foreach (var q_c in correctDFA.Q)
@@ -191,6 +197,11 @@ namespace AutomataPDL.Automata
 
             if (!acceptingCorrect)
                 feedbackList.Add("You'll need to change the accepting condition of some states!");
+
+            if (feedbackList.Count == 0)
+            {
+                feedbackList.Add("CORRECT!!");
+            }
 
             return new Tuple<int, List<string>>(grade, feedbackList);
         }
@@ -228,6 +239,8 @@ namespace AutomataPDL.Automata
         {
             var feedbackList = new List<string>();
 
+            int n = D.Q.Count;
+
             var G = BuildDependencyGraph(D);
             int maxLength = -1;
             for (int i = 0; i < T_C.Length; i++)
@@ -243,9 +256,9 @@ namespace AutomataPDL.Automata
 
             for (int i = 0; i <= maxLength; i++)
             {
-                for (int j = 0; j <= D.Q.Count; j++)
+                for (int j = 0; j < n; j++)
                 {
-                    for (int k = j + 1; k <= D.Q.Count; k++)
+                    for (int k = j + 1; k < n; k++)
                     {
                         var p = D.Q.ElementAt(j);
                         var q = D.Q.ElementAt(k);
@@ -264,17 +277,17 @@ namespace AutomataPDL.Automata
                             q = tmp2;
                         }
 
-                        string w_A = T_A[(q_id * q_id) - q_id / 2 + p_id];
-                        string w_C = T_C[(q_id * q_id) - q_id / 2 + p_id];
+                        string w_A = T_A[(q_id * q_id - q_id) / 2 + p_id];
+                        string w_C = T_C[(q_id * q_id - q_id) / 2 + p_id];
                         int n_A = (w_A != null) ? w_A.Length : Int32.MaxValue;
                         int n_C = (w_C != null) ? w_C.Length : Int32.MaxValue;
 
                         if (Math.Min(n_A, n_C) == i)
                         {
-                            if (IsMistake(w_A, p, q, D))
+                            if (IsMistake(w_A, w_C, p, q, D))
                             {
                                 feedbackList.Add(feedbackCases<S>(w_A, w_C, i, p, q, D));
-                                markRed<S>(w_A, p, q, G, T_A, D);
+                                markRed<S>(w_A, p, q, G, T_A, T_C, D);
                             }
                             else
                             {
@@ -285,7 +298,61 @@ namespace AutomataPDL.Automata
                 }
             }
 
-            int grade = 10;
+            if (feedbackList.Count == 0)
+            {
+                feedbackList.Add("CORRECT!!");
+            }
+            else
+            {
+                if (feedbackList.Count > 3)
+                {
+                    feedbackList.RemoveRange(3, feedbackList.Count - 3);
+                    feedbackList.Add("There may be more mistakes!");
+                }
+                feedbackList.Add("Mind, that mistakes may have propagated! Take a look at entries depending on corrected ones.");
+            }
+
+            int simCount = 0;
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = i + 1; j < n; j++)
+                {
+                    var p = D.Q.ElementAt(i);
+                    var q = D.Q.ElementAt(j);
+
+                    int p_id = p.id;
+                    int q_id = q.id;
+
+                    if (p_id > q_id)
+                    {
+                        int tmp = p_id;
+                        p_id = q_id;
+                        q_id = tmp;
+
+                        var tmp2 = p;
+                        p = q;
+                        q = tmp2;
+                    }
+
+                    string w_A = T_A[(q_id * q_id - q_id) / 2 + p_id];
+                    string w_C = T_C[(q_id * q_id - q_id) / 2 + p_id];
+
+                    if (IsMistake(w_A, w_C, p, q, D))
+                    {
+                        simCount--;
+                    }
+                    else
+                    {
+                        simCount++;
+                    }
+                }
+            }
+            float sim = 1.0f * simCount / ((n * n - n) / 2);
+            
+            int grade = (int)(10 * sim);
+
+            if (grade < 0)
+                grade = 0;
 
             return new Tuple<int, List<string>>(grade, feedbackList);
         }
@@ -302,7 +369,7 @@ namespace AutomataPDL.Automata
             }
         }
 
-        private static void markRed<S>(string w, State<S> p, State<S> q, Dictionary<Set<State<S>>, TwoTuple<bool, List<Set<State<S>>>>> G, string[] T, DFA<char, S> D)
+        private static void markRed<S>(string w, State<S> p, State<S> q, Dictionary<Set<State<S>>, TwoTuple<bool, List<Set<State<S>>>>> G, string[] T_A, string[] T_C, DFA<char, S> D)
         {
             TwoTuple<bool, List<Set<State<S>>>> t;
             var M = new Set<State<S>>();
@@ -311,6 +378,8 @@ namespace AutomataPDL.Automata
             if (G.TryGetValue(M, out t))
             {
                 t.first = true;
+                if (w == null)
+                    return;
 
                 foreach (var X in t.second)
                 {
@@ -333,7 +402,8 @@ namespace AutomataPDL.Automata
                             p_dash = q_dash;
                             q_dash = tmp2;
                         }
-                        string w_dash = T[(q_id * q_id) - q_id / 2 + p_id];
+                        string w_dash = T_A[(q_id * q_id - q_id) / 2 + p_id];
+                        string s = T_C[(q_id * q_id - q_id) / 2 + p_id];
 
                         if (w_dash != null && w_dash.Length > 0)
                         {
@@ -343,9 +413,9 @@ namespace AutomataPDL.Automata
                             State<S> delta_p_dash_a, delta_q_dash_a;
                             if (D.delta.TryGetValue(new TwoTuple<State<S>, char>(p_dash, a), out delta_p_dash_a)) { }
                             if (D.delta.TryGetValue(new TwoTuple<State<S>, char>(q_dash, a), out delta_q_dash_a)) { }
-                            if (w.Equals(w2) && delta_p_dash_a.Equals(p_dash) && delta_q_dash_a.Equals(q_dash) && IsMistake(w_dash, p_dash, q_dash, D))
+                            if (w.Equals(w2) && delta_p_dash_a.Equals(p_dash) && delta_q_dash_a.Equals(q_dash) && IsMistake(w_dash, s, p_dash, q_dash, D))
                             {
-                                markRed(w_dash, p_dash, q_dash, G, T, D);
+                                markRed(w_dash, p_dash, q_dash, G, T_A, T_C, D);
                             }
                         }
                     }
@@ -359,11 +429,17 @@ namespace AutomataPDL.Automata
 
             int n_A = (w_A != null) ? w_A.Length : -1;
             int n_C = (w_C != null) ? w_C.Length : -1;
-
-            var w_A_sequence = w_A.ToList();
-
+            
             int p_id = p.id;
             int q_id = q.id;
+
+            if (n_A == -1)
+            {
+                outstring += p_id + " and " + q_id + " are distinguishable.";
+                return outstring;
+            }
+
+            var w_A_sequence = w_A.ToList();
 
             var p_dash = D.ReadWordFrom(w_A_sequence, p);
             var q_dash = D.ReadWordFrom(w_A_sequence, q);
@@ -406,7 +482,7 @@ namespace AutomataPDL.Automata
                         if (p_acc == q_acc)
                         {
                             //delta(p,w_A) and delta(q,w_A) must have same acceptance condition
-                            outstring += "Reading " + w_A + " from states (" + p_id + q_id + ") gets you to states (" + p_dash_id + q_dash_id + "), both of which are ";
+                            outstring += "Reading " + w_A + " from states (" + p_id + ", " + q_id + ") gets you to states (" + p_dash_id + ", " + q_dash_id + "), both of which are ";
                             outstring += (p_acc) ? "" : "not ";
                             outstring += "accepting.\n\t A different word may distinguish " + p_id + " and " + q_id + " though.";
                             return outstring;
@@ -426,7 +502,7 @@ namespace AutomataPDL.Automata
                     if (n_C == -1)
                     {
                         //delta(p,w_A) and delta(q,w_A) must have same acceptance condition
-                        outstring += "Reading " + w_A + " from states (" + p_id + q_id + ") gets you to states (" + p_dash_id + q_dash_id + "), both of which are ";
+                        outstring += "Reading " + w_A + " from states (" + p_id + ", " + q_id + ") gets you to states (" + p_dash_id + ", " + q_dash_id + "), both of which are ";
                         outstring += (p_acc) ? "" : "not ";
                         outstring += "accepting.";
                         return outstring;
@@ -434,7 +510,7 @@ namespace AutomataPDL.Automata
                     else if (n_C > n)
                     {
                         //delta(p,w_A) and delta(q,w_A) must have same acceptance condition
-                        outstring += "Reading " + w_A + " from states (" + p_id + q_id + ") gets you to states (" + p_dash_id + q_dash_id + "), both of which are ";
+                        outstring += "Reading " + w_A + " from states (" + p_id + ", " + q_id + ") gets you to states (" + p_dash_id + ", " + q_dash_id + "), both of which are ";
                         outstring += (p_acc) ? "" : "not ";
                         outstring += "accepting.\n\t A longer word may distinguish " + p_id + " and " + q_id + " though.";
                         return outstring;
@@ -442,7 +518,7 @@ namespace AutomataPDL.Automata
                     else if (p_acc == q_acc) //Means n_C == n.
                     {
                         //delta(p,w_A) and delta(q,w_A) must have same acceptance condition
-                        outstring += "Reading " + w_A + " from states (" + p_id + q_id + ") gets you to states (" + p_dash_id + q_dash_id + "), both of which are ";
+                        outstring += "Reading " + w_A + " from states (" + p_id + ", " + q_id + ") gets you to states (" + p_dash_id + ", " + q_dash_id + "), both of which are ";
                         outstring += (p_acc) ? "" : "not ";
                         outstring += "accepting.\n\t A different word may distinguish " + p_id + " and " + q_id + " though.";
                         return outstring;
@@ -460,7 +536,7 @@ namespace AutomataPDL.Automata
                         if (p_acc == q_acc)
                         {
                             //delta(p,w_A) and delta(q,w_A) must have same acceptance condition
-                            outstring += "Reading " + w_A + " from states (" + p_id + q_id + ") gets you to states (" + p_dash_id + q_dash_id + "), both of which are ";
+                            outstring += "Reading " + w_A + " from states (" + p_id + ", " + q_id + ") gets you to states (" + p_dash_id + ", " + q_dash_id + "), both of which are ";
                             outstring += (p_acc) ? "" : "not ";
                             outstring += "accepting.\n\t A different word may distinguish " + p_id + " and " + q_id + " though.";
                             return outstring;
@@ -478,9 +554,22 @@ namespace AutomataPDL.Automata
         }
 
         //Returns 'true' iff w doesn't distinguish states p and q.
-        private static bool IsMistake<S>(string w, State<S> p, State<S> q, DFA<char, S> D)
+        private static bool IsMistake<S>(string w_A, string w_C, State<S> p, State<S> q, DFA<char, S> D)
         {
-            List<char> l = w.ToList();
+            if (w_A == w_C)
+            {
+                return false;
+            }
+
+            int n_A = (w_A != null) ? w_A.Length : Int32.MaxValue;
+            int n_C = (w_C != null) ? w_C.Length : Int32.MaxValue;
+
+            if (n_A != n_C)
+            {
+                return true;
+            }
+
+            List<char> l = w_A.ToList();
 
             bool b = D.AcceptsFrom(l, p);
             bool c = D.AcceptsFrom(l, q);
@@ -524,12 +613,15 @@ namespace AutomataPDL.Automata
                         State<S> p, q;
                         if (!D.delta.TryGetValue(t1, out p)) { }
                         if (!D.delta.TryGetValue(t2, out q)) { }
-                        Set<State<S>> v = new Set<State<S>>();
-                        v.content.Add(p);
-                        v.content.Add(q);
-                        TwoTuple<bool, List<Set<State<S>>>> t;
-                        if (!G.TryGetValue(v, out t)) { }
-                        t.second.Add(v_dash);
+                        if (!p.Equals(q))
+                        {
+                            Set<State<S>> v = new Set<State<S>>();
+                            v.content.Add(p);
+                            v.content.Add(q);
+                            TwoTuple<bool, List<Set<State<S>>>> t;
+                            if (!G.TryGetValue(v, out t)) { }
+                            t.second.Add(v_dash);
+                        }
                     }
                 }
             }

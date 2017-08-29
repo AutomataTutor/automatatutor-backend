@@ -89,10 +89,10 @@ namespace WebServicePDL
         public XElement ComputeFeedbackMinimization(XElement dfaDesc, XElement minimizationTableAttempt, XElement dfaAttemptDesc, XElement maxGrade, XElement feedbackLevel, XElement enableFeedbacks)
         {
             var D = AutomataUtilities.ParseDFAFromXML(dfaDesc);
-            var tableCorrect = AutomataUtilities.GetTableFromPartition(D.ComputeLanguagePartition());
-            var tableAttempt = AutomataUtilities.ParseMinimizationTableFromXML(minimizationTableAttempt);
+            var tableCorrect = D.GetMinimizationTable();
+            var tableAttempt = AutomataUtilities.ParseMinimizationTableShortestWordsFromXML(minimizationTableAttempt);
 
-            var feedbackGrade = AutomataFeedback.FeedbackForMinimization(tableCorrect, tableAttempt);
+            var feedbackGrade = AutomataFeedback.FeedbackForMinimizationTable(tableCorrect, tableAttempt, D);
 
             /*
             CharSetSolver solver = new CharSetSolver(BitWidth.BV64);
