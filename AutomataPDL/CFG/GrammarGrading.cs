@@ -37,7 +37,7 @@ namespace AutomataPDL.CFG
                 if (prefixLength < 0) correct++; //correct
                 else //wrong
                 {
-                    feedback.Add( String.Format("The word \"{0}\" isn't in the grammar but should be! (hint: the word '{1}' is still possible prefix)", w, w.Substring(0, prefixLength)) );
+                    feedback.Add( String.Format("The word \"{0}\" isn't in the grammar! (hint: the word '{1}' is still possible prefix)", w, w.Substring(0, prefixLength)) );
                 }
             }
             foreach (String w in wordsOut)
@@ -74,7 +74,7 @@ namespace AutomataPDL.CFG
                     }
                 } else //wrong
                 {
-                    feedback.Add(String.Format("The word \"{0}\" is in the grammar but shouldn't be!", w));
+                    feedback.Add(String.Format("The word \"{0}\" is in the grammar!", w));
                 }
             }
 
