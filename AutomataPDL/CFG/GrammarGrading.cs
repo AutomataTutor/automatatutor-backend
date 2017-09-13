@@ -37,7 +37,7 @@ namespace AutomataPDL.CFG
                 if (prefixLength < 0) correct++; //correct
                 else //wrong
                 {
-                    feedback.Add( String.Format("The word \"{0}\" isn't in the grammar! (hint: the word '{1}' is still possible prefix)", w, w.Substring(0, prefixLength)) );
+                    feedback.Add( String.Format("The word \"{0}\" isn't in the language of the grammar! (hint: the word '{1}' is still possible prefix)", w, w.Substring(0, prefixLength)) );
                 }
             }
             foreach (String w in wordsOut)
@@ -70,11 +70,11 @@ namespace AutomataPDL.CFG
                     else //only half the points
                     {
                         correct += 0.5;
-                        feedback.Add(String.Format("The word \"{0}\" uses the useless terminal '{1}'...", w, problem));
+                        feedback.Add(String.Format("The word \"{0}\" uses the symbol '{1}' that is not part of the alphabet...", w, problem));
                     }
                 } else //wrong
                 {
-                    feedback.Add(String.Format("The word \"{0}\" is in the grammar!", w));
+                    feedback.Add(String.Format("The word \"{0}\" is in the language of the grammar!", w));
                 }
             }
 
@@ -98,7 +98,7 @@ namespace AutomataPDL.CFG
 
             if (missing.Count == 0 && tooMuch.Count == 0) //correct
             {
-                feedback.Add("Correct!");
+                feedback.Add(String.Format("All tests passed! (checked {0} words)", correct));
                 return Tuple.Create(maxGrade, (IEnumerable<String>)feedback);
             }
 
@@ -106,8 +106,8 @@ namespace AutomataPDL.CFG
             int grade = (int)Math.Floor(correct * maxGrade / (double)allChecked);
             double percMissing = missing.Count * 100 / (double)allChecked;
             double percTooMuch = tooMuch.Count * 100 / (double)allChecked;
-            if (missing.Count > 0) feedback.Add(String.Format("Your solution misses some words (~{0:F2}%) e.g. you should accept \"{1}\"", percMissing, missing[0]));
-            if (tooMuch.Count > 0) feedback.Add(String.Format("Your solution accepts too many words (~{0:F2}%) e.g. you shouldn't accept \"{1}\"", percTooMuch, tooMuch[0]));
+            if (missing.Count > 0) feedback.Add(String.Format("Your solution misses words (~{0:F2}% of checked words). One of them is \"{1}\".", percMissing, missing[0]));
+            if (tooMuch.Count > 0) feedback.Add(String.Format("Your solution accepts too many words (~{0:F2}% of checked words). One of them is \"{1}\".", percTooMuch, tooMuch[0]));
 
             return Tuple.Create(grade, (IEnumerable<String>)feedback);
         }
@@ -160,11 +160,11 @@ namespace AutomataPDL.CFG
                     if (withExample)
                     {
                         if (missing != 0) feedback.Add(String.Format("You are missing some nonterminals in field {0} e.g. {1}", fieldName, missingExample));
-                        if (tooMuch != 0) feedback.Add(String.Format("You have nonterminals in field {0} that don't belong there... e.g. {1}", fieldName, tooMuchExample));
+                        if (tooMuch != 0) feedback.Add(String.Format("There are nonterminals in field {0} that don't belong there... e.g. {1}", fieldName, tooMuchExample));
                     } else
                     {
                         if (missing != 0) feedback.Add(String.Format("You are missing some nonterminals in field {0}...", fieldName));
-                        if (tooMuch != 0) feedback.Add(String.Format("You have nonterminals in field {0} that don't belong there...", fieldName));
+                        if (tooMuch != 0) feedback.Add(String.Format("There are nonterminals in field {0} that don't belong there...", fieldName));
                     }
                 }
                 

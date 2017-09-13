@@ -459,6 +459,7 @@ namespace WebServicePDL
         [WebMethod]
         public XElement ComputeGrammarEqualityFeedback(XElement solution, XElement attempt, XElement maxGrade, XElement checkEmptyWord)
         {
+            var feedString = "<ul>";
             //read inputs
             ContextFreeGrammar sol, att;
             try
@@ -473,6 +474,10 @@ namespace WebServicePDL
             int maxG = int.Parse(maxGrade.Value);
             bool checkEW = bool.Parse(checkEmptyWord.Value);
 
+            //get warnings for useless variables
+            foreach (var warning in GrammarUtilities.getGrammarWarnings(att))
+                feedString += string.Format("<li>{0}</li>", warning);
+
             //ignore empty string?
             if (!checkEW)
             {
@@ -483,9 +488,9 @@ namespace WebServicePDL
             var result = GrammarGrading.gradeGrammarEquality(sol, att, maxG, 1000);
 
             //build return value
-            var feedString = "<ul>";
             foreach (var feed in result.Item2)
                 feedString += string.Format("<li>{0}</li>", feed);
+
             feedString += "</ul>";
             int grade = result.Item1;
 

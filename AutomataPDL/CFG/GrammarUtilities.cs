@@ -8,7 +8,42 @@ namespace AutomataPDL.CFG
 {
     public static class GrammarUtilities
     {
+        /// <summary>
+        /// Genereates warnings for useless variables.
+        /// </summary>
+        /// <param name="g">the grammar</param>
+        /// <returns></returns>
+        public static List<string> getGrammarWarnings(ContextFreeGrammar g)
+        {
+            List<string> res = new List<string>();
+            HashSet<string> variables = new HashSet<string>();
+            foreach (var n in g.Variables) variables.Add(n.ToString());
 
+            var productiv = g.GetUsefulNonterminals(true);
+            var unproductiv = variables.Except(productiv);
+            if (unproductiv.Count() > 0) res.Add(string.Format("Warning: There are unproductive variables! ({0})", string.Join(", ",unproductiv)));
+
+            var reachable = new HashSet<string>();
+            //Lemma 4.2, p. 89, Hopcroft-Ullman
+            Stack<Nonterminal> stack = new Stack<Nonterminal>();
+            stack.Push(g.StartSymbol);
+            reachable.Add(g.StartSymbol.ToString());
+            while (stack.Count > 0)
+            {
+                Nonterminal v = stack.Pop();
+                foreach (Production p in g.GetProductions(v))
+                    foreach (Nonterminal u in p.GetVariables())
+                        if (!reachable.Contains(u.ToString()))
+                        {
+                            reachable.Add(u.ToString());
+                            stack.Push(u);
+                        }
+            }
+            var unreachable = variables.Except(reachable);
+            if (unproductiv.Count() > 0) res.Add(string.Format("Warning: There are unreachable variables! ({0})", string.Join(", ", unreachable)));
+            
+            return res;
+        }
 
         /// <summary>
         /// Generates a CNF for a given grammar or returns null if the Grammar doesn't produce any words.
