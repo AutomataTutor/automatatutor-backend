@@ -112,23 +112,24 @@ namespace AutomataPDL.CFG
             return Tuple.Create(grade, (IEnumerable<String>)feedback);
         }
 
-        public static Tuple<int, IEnumerable<String>> gradeCYK(ContextFreeGrammar grammar, String word, HashSet<Nonterminal>[][] attempt, int maxGrade, bool withExample)
+        public static Tuple<int, IEnumerable<String>> gradeCYK(ContextFreeGrammar grammar, String word, HashSet<Nonterminal>[][] attempt, int maxGrade, int feedbackLevel)
         {
             List<String> feedback = new List<String>();
 
             int n = word.Length;
             int checked_length = 0;
-            HashSet<Nonterminal>[][] sol = GrammarUtilities.cyk(grammar, word);
+            var sol = GrammarUtilities.cyk(grammar, word);
             bool all_correct_sofar = true;
 
             for (int len = 1; len <= n; len++)
             {
                 for(int start = 0; start + len <= n; start++)
                 {
-                    HashSet<Nonterminal> must = sol[len - 1][start];
+                    HashSet<Nonterminal> must = sol[len - 1][start].Item1;
                     HashSet<Nonterminal> was = attempt[len - 1][start];
 
                     Nonterminal missingExample = null;
+                    Production missingApplicableProduction = null;
                     int missing = 0;
                     Nonterminal tooMuchExample = null;
                     int tooMuch = 0;
@@ -138,9 +139,20 @@ namespace AutomataPDL.CFG
                     {
                         if (!was.Contains(nt))
                         {
-                            missingExample = nt;
                             missing++;
                             all_correct_sofar = false;
+
+                            //save as example and look for corresponding applicable production for hint
+                            if (missingApplicableProduction != null) continue; //not needed: already found example
+                            missingExample = nt;
+                            foreach (var applicable in sol[len - 1][start].Item2)
+                            {
+                                if (applicable.Item1.Lhs.Equals(nt))
+                                {
+                                    missingApplicableProduction = applicable.Item1;
+                                    break;
+                                }
+                            }
                         }
                     }
 
@@ -157,11 +169,17 @@ namespace AutomataPDL.CFG
 
                     //feedback
                     String fieldName = String.Format("({0},{1})", start + 1, start + len);
-                    if (withExample)
+                    if (feedbackLevel >= 2)
                     {
                         if (missing != 0) feedback.Add(String.Format("You are missing some nonterminals in field {0} e.g. {1}", fieldName, missingExample));
                         if (tooMuch != 0) feedback.Add(String.Format("There are nonterminals in field {0} that don't belong there... e.g. {1}", fieldName, tooMuchExample));
-                    } else
+                    }
+                    else if (feedbackLevel >= 1)
+                    {
+                        if (missing != 0) feedback.Add(String.Format("You are missing some nonterminals in field {0}... (hint: The production \"{1}\" is applicable.)", fieldName, missingApplicableProduction));
+                        if (tooMuch != 0) feedback.Add(String.Format("There are nonterminals in field {0} that don't belong there...", fieldName));
+                    }
+                    else
                     {
                         if (missing != 0) feedback.Add(String.Format("You are missing some nonterminals in field {0}...", fieldName));
                         if (tooMuch != 0) feedback.Add(String.Format("There are nonterminals in field {0} that don't belong there...", fieldName));

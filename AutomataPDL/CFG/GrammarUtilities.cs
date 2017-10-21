@@ -155,7 +155,7 @@ namespace AutomataPDL.CFG
             //CYK
             var cyk_table = cyk(grammar, word);
 
-            return cyk_table[word.Length - 1][0].Contains(grammar.StartSymbol);
+            return cyk_table[word.Length - 1][0].Item1.Contains(grammar.StartSymbol);
         }
 
         /// <summary>
@@ -184,12 +184,12 @@ namespace AutomataPDL.CFG
             var cyk_table = cyk(prefixGrammar, word);
 
             //check if word was in original grammar
-            if (cyk_table[word.Length - 1][0].Contains(grammar.StartSymbol)) return -2;
+            if (cyk_table[word.Length - 1][0].Item1.Contains(grammar.StartSymbol)) return -2;
 
             //check for startsymbol in first row
             for (int i = word.Length - 1; i >= 0; i--)
             {
-                if (cyk_table[i][0].Contains(prefixGrammar.StartSymbol)) return i+1;
+                if (cyk_table[i][0].Item1.Contains(prefixGrammar.StartSymbol)) return i+1;
             }
             return 0;
         }
@@ -200,51 +200,65 @@ namespace AutomataPDL.CFG
         /// <param name="grammar">the grammar (in CNF)</param>
         /// <param name="word">the word (not null)</param>
         /// <returns>the filled table of the cyk-algorithm</returns>
-        public static HashSet<Nonterminal>[][] cyk(ContextFreeGrammar grammar, string word)
+        public static Tuple<HashSet<Nonterminal>, List<Tuple<Production, int>>>[][] cyk(ContextFreeGrammar grammar, string word)
         {
-            //CYK algorithm
+            /*
+             * Every entry in the table consists of 2 parts:
+             *      1. The HasSet of all Nonterminals that produce the corresponding subword
+             *      2. All possible subtrees encodes as pair (p,x) 
+             *          where p is the applicable production and 
+             *          x is the lengt of the word produced by the first grammarsymbol on the right hand side of p
+             */
+
+            //prepare CYK table
             int n = word.Length;
-            HashSet<Nonterminal>[][] cyk = new HashSet<Nonterminal>[n][];
+            Tuple<HashSet<Nonterminal>, List<Tuple<Production, int>>>[][] cyk = new Tuple<HashSet<Nonterminal>, List<Tuple<Production, int>>>[n][];
             for (int i = 0; i < n; i++)
             {
-                cyk[i] = new HashSet<Nonterminal>[n - i];
-                for (int j = 0; j < n - i; j++) cyk[i][j] = new HashSet<Nonterminal>();
+                cyk[i] = new Tuple<HashSet<Nonterminal>, List<Tuple<Production, int>>>[n - i];
+                for (int j = 0; j < n - i; j++) cyk[i][j] = new Tuple<HashSet<Nonterminal>, List<Tuple<Production, int>>>(new HashSet<Nonterminal>(), new List<Tuple<Production, int>>());
             }
 
-            //prepare lookups
-            Dictionary<Tuple<Nonterminal, Nonterminal>, HashSet<Nonterminal>> lookupNT = new Dictionary<Tuple<Nonterminal, Nonterminal>, HashSet<Nonterminal>>();
-            Dictionary<string, HashSet<Nonterminal>> lookupT = new Dictionary<string, HashSet<Nonterminal>>();
+            //prepare lookups (productions for a given NT or pair of NTs)
+            Dictionary<Tuple<Nonterminal, Nonterminal>, HashSet<Production>> lookupNT = new Dictionary<Tuple<Nonterminal, Nonterminal>, HashSet<Production>>();
+            Dictionary<string, HashSet<Production>> lookupT = new Dictionary<string, HashSet<Production>>();
             foreach (Production p in grammar.GetProductions())
             {
                 if (p.IsSingleExprinal) //form: X -> a
                 {
-                    HashSet<Nonterminal> hashset = null;
+                    HashSet<Production> hashset = null;
                     if (!lookupT.TryGetValue(p.Rhs[0].Name, out hashset))
                     {
-                        hashset = new HashSet<Nonterminal>();
+                        hashset = new HashSet<Production>();
                         lookupT.Add(p.Rhs[0].Name, hashset);
                     }
-                    hashset.Add(p.Lhs);
+                    hashset.Add(p);
                 }
                 else if (p.Rhs.Length == 2)//form: X -> A B
                 {
-                    HashSet<Nonterminal> hashset = null;
+                    HashSet<Production> hashset = null;
                     var tuple = new Tuple<Nonterminal, Nonterminal>((Nonterminal)p.Rhs[0], (Nonterminal)p.Rhs[1]);
                     if (!lookupNT.TryGetValue(tuple, out hashset))
                     {
-                        hashset = new HashSet<Nonterminal>();
+                        hashset = new HashSet<Production>();
                         lookupNT.Add(tuple, hashset);
                     }
-                    hashset.Add(p.Lhs);
+                    hashset.Add(p);
                 }
             }
 
+            //CYK algorithm
             //first row (check for Productions X -> a)
             for (int i = 0; i < n; i++)
             {
-                if (!lookupT.TryGetValue(word.Substring(i, 1), out cyk[0][i]))
+                HashSet<Production> applicable = null;
+                if (lookupT.TryGetValue(word.Substring(i, 1), out applicable))
                 {
-                    cyk[0][i] = new HashSet<Nonterminal>();
+                    foreach(Production p in applicable)
+                    {
+                        cyk[0][i].Item1.Add(p.Lhs);
+                        cyk[0][i].Item2.Add(new Tuple<Production, int>(p, 1));
+                    }
                 }
             }
             //fill rest
@@ -255,8 +269,8 @@ namespace AutomataPDL.CFG
                     //to_fill: cyk[length][start]
                     for (int part1 = 0; part1 < length; part1++)
                     {
-                        var left = cyk[part1][start];
-                        var right = cyk[length - 1 - part1][start + 1 + part1];
+                        var left = cyk[part1][start].Item1;
+                        var right = cyk[length - 1 - part1][start + 1 + part1].Item1;
                         if (left.Count > 0 && right.Count > 0)
                         {
                             foreach (Nonterminal leftNT in left)
@@ -264,10 +278,14 @@ namespace AutomataPDL.CFG
                                 foreach (Nonterminal rightNT in right)
                                 {
                                     var tuple = new Tuple<Nonterminal, Nonterminal>(leftNT, rightNT);
-                                    HashSet<Nonterminal> found = null;
-                                    if (lookupNT.TryGetValue(new Tuple<Nonterminal, Nonterminal>(leftNT, rightNT), out found))
+                                    HashSet<Production> applicable = null;
+                                    if (lookupNT.TryGetValue(new Tuple<Nonterminal, Nonterminal>(leftNT, rightNT), out applicable))
                                     {
-                                        cyk[length][start].UnionWith(found);
+                                        foreach (Production p in applicable)
+                                        {
+                                            cyk[length][start].Item1.Add(p.Lhs);
+                                            cyk[length][start].Item2.Add(new Tuple<Production, int>(p, part1+1));
+                                        }
                                     }
                                 }
                             }

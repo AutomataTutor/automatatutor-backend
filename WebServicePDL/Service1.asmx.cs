@@ -536,7 +536,7 @@ namespace WebServicePDL
             }
 
             //grade
-            var result = GrammarGrading.gradeCYK(g, w, cyk_table, maxG, false);
+            var result = GrammarGrading.gradeCYK(g, w, cyk_table, maxG, 0);
 
             //build return value
             var feedString = "<ul>";
