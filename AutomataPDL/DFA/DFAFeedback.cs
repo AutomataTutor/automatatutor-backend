@@ -269,7 +269,7 @@ namespace AutomataPDL
 
         public override string ToString()
         {
-            long enumTimeout = 1500L;
+            long enumTimeout = 1000L;
             #region feedback components
             PDLEnumerator pdlEnumerator = new PDLEnumerator();
             PDLPred symmPhi = null;
@@ -281,15 +281,16 @@ namespace AutomataPDL
             {
                 //Avoid formulas that are too complex
                 var maxSize = 7;
-                foreach (var phi1 in pdlEnumerator.SynthesizePDL(alphabet, symmetricDifference, solver, new StringBuilder(), enumTimeout))
-                {
-                    var sizePhi1 = phi1.GetFormulaSize();
-                    if (sizePhi1 < maxSize && !phi1.IsComplex())
+                if(symmetricDifference.StateCount<15)
+                    foreach (var phi1 in pdlEnumerator.SynthesizePDL(alphabet, symmetricDifference, solver, new StringBuilder(), enumTimeout))
                     {
-                        maxSize = sizePhi1;
-                        symmPhi = phi1;
+                        var sizePhi1 = phi1.GetFormulaSize();
+                        if (sizePhi1 < maxSize && !phi1.IsComplex())
+                        {
+                            maxSize = sizePhi1;
+                            symmPhi = phi1;
+                        }
                     }
-                }
             }
             //Avoid empty string case and particular string
             if (symmPhi is PDLEmptyString || symmPhi is PDLIsString)
@@ -300,18 +301,19 @@ namespace AutomataPDL
             {
                 //Avoid formulas that are too complex
                 var minSize = 9;
-                foreach (var phi2 in pdlEnumerator.SynthesizeUnderapproximationPDL(alphabet, symmetricDifference, solver, new StringBuilder(), enumTimeout))
-                {
-                    var formula = phi2.First;
-                    var sizeForm = formula.GetFormulaSize();
-                    if (sizeForm < minSize && !formula.IsComplex())
+                if (symmetricDifference.StateCount < 15)
+                    foreach (var phi2 in pdlEnumerator.SynthesizeUnderapproximationPDL(alphabet, symmetricDifference, solver, new StringBuilder(), enumTimeout))
                     {
-                        minSize = sizeForm;
-                        underPhi = formula;
-                    }
+                        var formula = phi2.First;
+                        var sizeForm = formula.GetFormulaSize();
+                        if (sizeForm < minSize && !formula.IsComplex())
+                        {
+                            minSize = sizeForm;
+                            underPhi = formula;
+                        }
 
-                    break;
-                }
+                        break;
+                    }
             }
             //Avoid empty string case and particular string
             if (underPhi is PDLEmptyString || underPhi is PDLIsString)
