@@ -90,6 +90,16 @@ namespace AutomataPDL
 
         }
 
+        public static List<Pair<HashSet<char>, Automaton<BDD>>> parseDFAListFromXML(XElement automataList, CharSetSolver solver)
+        {
+            var outList = new List<Pair<HashSet<char>, Automaton<BDD>>>();
+            foreach(XElement Automaton in automataList.Elements()) {
+                outList.Add(parseDFAFromXML(Automaton.Elements().First(), solver));
+            }
+
+            return outList;
+        }
+
         public static Pair<HashSet<char>, Automaton<BDD>> parseNFAFromXML(XElement Automaton1, CharSetSolver solver)
         {
             HashSet<char> al = new HashSet<char>();

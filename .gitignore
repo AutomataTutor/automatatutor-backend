@@ -111,3 +111,4 @@ regexpenum.txt
 /WebServicePDL/bin
 /WebServicePDL/obj/x86/Debug
 /WebServicePDL/Properties
+.vs

@@ -29,9 +29,13 @@
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis
+            Tools\\Rule Sets
+        </CodeAnalysisRuleSetDirectories>
     <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
-    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis
+            Tools\FxCop\\Rules
+        </CodeAnalysisRuleDirectories>
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
@@ -46,9 +50,13 @@
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis
+            Tools\\Rule Sets
+        </CodeAnalysisRuleSetDirectories>
     <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
-    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis
+            Tools\FxCop\\Rules
+        </CodeAnalysisRuleDirectories>
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
@@ -84,6 +92,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Automata\AbstractAutomaton.cs" />
+    <Compile Include="Automata\AutomataFeedback.cs" />
+    <Compile Include="Automata\AutomataUtilities.cs" />
+    <Compile Include="Automata\DFA.cs" />
+    <Compile Include="Automata\NFA.cs" />
+    <Compile Include="Automata\NTuple.cs" />
+    <Compile Include="Automata\Set.cs" />
+    <Compile Include="Automata\State.cs" />
+    <Compile Include="Automata\TwoTuple.cs" />
+    <Compile Include="CFG\ContextFreeGrammar.cs" />
+    <Compile Include="CFG\GrammarGrading.cs" />
+    <Compile Include="CFG\GrammarSymbol.cs" />
+    <Compile Include="CFG\GrammarUtilities.cs" />
+    <Compile Include="CFG\GrammarParser.cs" />
+    <Compile Include="CFG\Nonterminal.cs" />
+    <Compile Include="CFG\Production.cs" />
+    <Compile Include="CFG\Terminal.cs" />
     <Compile Include="NFA\NFAUtilities.cs" />
     <Compile Include="NFA\NFAFeedback.cs" />
     <Compile Include="Utilities\BitVecUtil.cs" />
@@ -109,6 +134,7 @@
     <Compile Include="Regex\Regexp.cs" />
     <Compile Include="Regex\RegexpSynthesis.cs" />
     <Compile Include="Utilities\Utilities.cs" />
+    <Compile Include="Utilities\BooleanOperation.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MSOZ3\MSOZ3.csproj">
@@ -118,11 +144,5 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.        Other similar extension points exist, see Microsoft.Common.targets.  <Target Name="BeforeBuild">  </Target>  <Target Name="AfterBuild">  </Target>  -->
 </Project>
